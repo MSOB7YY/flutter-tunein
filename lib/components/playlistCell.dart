@@ -8,15 +8,18 @@ import 'package:Tunein/models/playerstate.dart';
 import 'package:Tunein/globals.dart';
 import 'package:Tunein/models/ContextMenuOption.dart';
 
-
 class PlaylistCell extends StatelessWidget {
-
-  final Playlist playlistItem;
-  VoidCallback onTap;
-  List<ContextMenuOptions> choices;
-  final void Function(ContextMenuOptions) onContextSelect;
-  final void Function() onContextCancel;
-  PlaylistCell({this.playlistItem, this.onTap, this.choices, this.onContextSelect, this.onContextCancel});
+  final Playlist? playlistItem;
+  VoidCallback? onTap;
+  List<ContextMenuOptions>? choices;
+  final void Function(ContextMenuOptions)? onContextSelect;
+  final void Function()? onContextCancel;
+  PlaylistCell(
+      {this.playlistItem,
+      this.onTap,
+      this.choices,
+      this.onContextSelect,
+      this.onContextCancel});
 
   final _textColor = Colors.white54;
   final _fontWeight = FontWeight.w400;
@@ -34,9 +37,9 @@ class PlaylistCell extends StatelessWidget {
                 color: Colors.transparent,
                 child: InkWell(
                   splashColor: MyTheme.darkgrey,
-                  child:Container(
+                  child: Container(
                     constraints: BoxConstraints.expand(),
-                    child:  Row(
+                    child: Row(
                       children: <Widget>[
                         Padding(
                           padding: EdgeInsets.only(right: 15),
@@ -47,11 +50,12 @@ class PlaylistCell extends StatelessWidget {
                               placeholder: AssetImage('images/track.png'),
                               fadeInDuration: Duration(milliseconds: 200),
                               fadeOutDuration: Duration(milliseconds: 100),
-                              image: playlistItem.covertArt != null
+                              image: playlistItem!.covertArt != null
                                   ? FileImage(
-                                new File(playlistItem.covertArt),
-                              )
-                                  : AssetImage('images/track.png'),
+                                      new File(playlistItem!.covertArt!),
+                                    )
+                                  : AssetImage('images/track.png')
+                                      as ImageProvider<Object>,
                             ),
                           ),
                         ),
@@ -63,9 +67,9 @@ class PlaylistCell extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Text(
-                                  (playlistItem.name == null)
+                                  (playlistItem!.name == null)
                                       ? "Unknon Title"
-                                      : playlistItem.name,
+                                      : playlistItem!.name as String,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 13.5,
@@ -75,9 +79,9 @@ class PlaylistCell extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                (playlistItem.songs == null)
+                                (playlistItem!.songs == null)
                                     ? "No songs"
-                                    : "${playlistItem.songs.length} song(s)",
+                                    : "${playlistItem!.songs!.length} song(s)",
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12.5,
@@ -91,8 +95,8 @@ class PlaylistCell extends StatelessWidget {
                       ],
                     ),
                   ),
-                  onTap: (){
-                    onTap();
+                  onTap: () {
+                    onTap!();
                   },
                 ),
               ),
@@ -110,25 +114,24 @@ class PlaylistCell extends StatelessWidget {
                     radius: 30.0,
                     child: Padding(
                         padding: const EdgeInsets.only(right: 10.0),
-                        child:Icon(
+                        child: Icon(
                           IconData(0xea7c, fontFamily: 'boxicons'),
                           size: 22,
                           color: Colors.white70,
-                        )
-                    ),
+                        )),
                   ),
                 ),
                 elevation: 3.2,
                 onCanceled: () {
                   print('You have not chosen anything');
-                  onContextCancel();
+                  onContextCancel!();
                 },
                 tooltip: 'Playing options',
-                onSelected: (ContextMenuOptions choice){
-                  onContextSelect(choice);
+                onSelected: (ContextMenuOptions choice) {
+                  onContextSelect!(choice);
                 },
                 itemBuilder: (BuildContext context) {
-                  return choices.map((ContextMenuOptions choice) {
+                  return choices!.map((ContextMenuOptions choice) {
                     return PopupMenuItem<ContextMenuOptions>(
                       value: choice,
                       child: Text(choice.title),

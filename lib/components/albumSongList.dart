@@ -3,7 +3,6 @@
 ///THIS HAS BEEN DEPRECATED AND MAY BE REMOVED IN THE FUTURE
 /// /////////////////////////////////////////////////////////
 
-
 import 'package:Tunein/components/card.dart';
 import 'package:Tunein/components/pageheader.dart';
 import 'package:Tunein/components/scrollbar.dart';
@@ -23,10 +22,10 @@ import 'package:flutter/rendering.dart';
 import 'package:upnp/upnp.dart' as upnp;
 
 class AlbumSongList extends StatefulWidget {
-
-  final Album album;
-  ScrollController controller;
-  AlbumSongList(this.album, {ScrollController this.controller});
+  final Album? album;
+  ScrollController? controller;
+  AlbumSongList(this.album,
+      {super.key, required ScrollController this.controller});
 
   @override
   _AlbumSongListState createState() => _AlbumSongListState();
@@ -35,8 +34,8 @@ class AlbumSongList extends StatefulWidget {
 class _AlbumSongListState extends State<AlbumSongList> {
   final musicService = locator<MusicService>();
   final castService = locator<CastService>();
-  ScrollController controller;
-  ScrollController parentController;
+  ScrollController? controller;
+  ScrollController? parentController;
   @override
   void initState() {
     // TODO: implement initState
@@ -50,15 +49,17 @@ class _AlbumSongListState extends State<AlbumSongList> {
     Size screenSize = MediaQuery.of(context).size;
 
     return StreamBuilder(
-      stream:  themeService.getThemeColors(widget.album.songs[0]).asStream(),
-      builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot){
+      stream: themeService.getThemeColors(widget.album!.songs[0]).asStream(),
+      builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
         List<int> bgColor;
 
-        bgColor=snapshot.data;
+        bgColor = snapshot.data!;
 
         return Container(
           alignment: Alignment.center,
-          color: bgColor!=null?Color(bgColor[0]).withRed(30).withGreen(30).withBlue(30):MyTheme.darkBlack,
+          color: bgColor != null
+              ? Color(bgColor[0]).withRed(30).withGreen(30).withBlue(30)
+              : MyTheme.darkBlack,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
@@ -67,14 +68,13 @@ class _AlbumSongListState extends State<AlbumSongList> {
                   children: <Widget>[
                     Flexible(
                       child: ListView.builder(
-                        padding: EdgeInsets.all(0).add(EdgeInsets.only(
-                            left:10
-                        )),
+                        padding:
+                            EdgeInsets.all(0).add(EdgeInsets.only(left: 10)),
                         controller: controller,
                         shrinkWrap: true,
                         itemExtent: 62,
                         physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: widget.album.songs.length + 1,
+                        itemCount: widget.album!.songs.length + 1,
                         itemBuilder: (context, index) {
                           if (index == 0) {
                             return Material(
@@ -92,73 +92,103 @@ class _AlbumSongListState extends State<AlbumSongList> {
 
                           int newIndex = index - 1;
                           return MyCard(
-                            song: widget.album.songs[newIndex],
+                            song: widget.album!.songs[newIndex],
                             choices: songCardContextMenulist,
                             ScreenSize: screenSize,
                             StaticContextMenuFromBottom: 0.0,
-                            onContextSelect: (choice) async{
-                              switch(choice.id){
-                                case 1: {
-                                  musicService.playOne(widget.album.songs[newIndex]);
-                                  break;
-                                }
-                                case 2:{
-                                  musicService.startWithAndShuffleQueue(widget.album.songs[newIndex], widget.album.songs);
-                                  break;
-                                }
-                                case 3:{
-                                  musicService.startWithAndShuffleAlbum(widget.album.songs[newIndex]);
-                                  break;
-                                }
-                                case 4:{
-                                  musicService.playAlbum(widget.album.songs[newIndex]);
-                                  break;
-                                }
-                                case 5:{
-                                  if(castService.currentDeviceToBeUsed.value==null){
-                                    upnp.Device result = await DialogService.openDevicePickingDialog(context, null);
-                                    if(result!=null){
-                                      castService.setDeviceToBeUsed(result);
+                            onContextSelect: (choice) async {
+                              switch (choice.id) {
+                                case 1:
+                                  {
+                                    musicService
+                                        .playOne(widget.album!.songs[newIndex]);
+                                    break;
+                                  }
+                                case 2:
+                                  {
+                                    musicService.startWithAndShuffleQueue(
+                                        widget.album!.songs[newIndex],
+                                        widget.album!.songs);
+                                    break;
+                                  }
+                                case 3:
+                                  {
+                                    musicService.startWithAndShuffleAlbum(
+                                        widget.album!.songs[newIndex]);
+                                    break;
+                                  }
+                                case 4:
+                                  {
+                                    musicService.playAlbum(
+                                        widget.album!.songs[newIndex]);
+                                    break;
+                                  }
+                                case 5:
+                                  {
+                                    if (castService
+                                            .currentDeviceToBeUsed.value ==
+                                        null) {
+                                      upnp.Device result = await DialogService
+                                          .openDevicePickingDialog(
+                                              context, null);
+                                      if (result != null) {
+                                        castService.setDeviceToBeUsed(result);
+                                      }
                                     }
+                                    musicService.castOrPlay(
+                                        widget.album!.songs[newIndex],
+                                        SingleCast: true);
+                                    break;
                                   }
-                                  musicService.castOrPlay(widget.album.songs[newIndex], SingleCast: true);
-                                  break;
-                                }
-                                case 6:{
-                                  upnp.Device result = await DialogService.openDevicePickingDialog(context, null);
-                                  if(result!=null){
-                                    musicService.castOrPlay(widget.album.songs[newIndex], SingleCast: true, device: result);
+                                case 6:
+                                  {
+                                    upnp.Device result = await DialogService
+                                        .openDevicePickingDialog(context, null);
+                                    if (result != null) {
+                                      musicService.castOrPlay(
+                                          widget.album!.songs[newIndex],
+                                          SingleCast: true,
+                                          device: result);
+                                    }
+                                    break;
                                   }
-                                  break;
-                                }
-                                case 7: {
-                                  DialogService.showAlertDialog(context,
-                                      title: "Song Information",
-                                      content: SongInfoWidget(null, song: widget.album.songs[newIndex]),
-                                      padding: EdgeInsets.only(top: 10)
-                                  );
-                                  break;
-                                }
-                                case 8:{
-
-                                  break;
-                                }
-                                case 9:{
-                                  PageRoutes.goToSingleArtistPage(widget.album.songs[0], context, subtract60ForBottomBar: true);
-                                  break;
-                                }
-                                case 10:{
-                                  PageRoutes.goToEditTagsPage(widget.album.songs[0], context, subtract60ForBottomBar: true);
-                                  break;
-                                }
+                                case 7:
+                                  {
+                                    DialogService.showAlertDialog(context,
+                                        title: "Song Information",
+                                        content: SongInfoWidget(null,
+                                            song:
+                                                widget.album!.songs[newIndex]),
+                                        padding: EdgeInsets.only(top: 10));
+                                    break;
+                                  }
+                                case 8:
+                                  {
+                                    break;
+                                  }
+                                case 9:
+                                  {
+                                    PageRoutes.goToSingleArtistPage(
+                                        widget.album!.songs[0], context,
+                                        subtract60ForBottomBar: true);
+                                    break;
+                                  }
+                                case 10:
+                                  {
+                                    PageRoutes.goToEditTagsPage(
+                                        widget.album!.songs[0], context,
+                                        subtract60ForBottomBar: true);
+                                    break;
+                                  }
                               }
                             },
-                            onContextCancel: (choice){
+                            onContextCancel: (choice) {
                               print("Cancelled");
                             },
-                            onTap: (){
-                              musicService.updatePlaylist(widget.album.songs);
-                              musicService.playOrPause(widget.album.songs[newIndex]);
+                            onTap: () {
+                              musicService.updatePlaylist(widget.album!.songs);
+                              musicService
+                                  .playOrPause(widget.album!.songs[newIndex]);
                             },
                           );
                         },
@@ -169,14 +199,14 @@ class _AlbumSongListState extends State<AlbumSongList> {
               ),
               MyScrollbar(
                 controller: controller,
-                color: bgColor!=null?Color(bgColor[0]).withRed(30).withGreen(30).withBlue(30):null,
+                color: bgColor != null
+                    ? Color(bgColor[0]).withRed(30).withGreen(30).withBlue(30)
+                    : null,
               ),
             ],
           ),
         );
       },
     );
-
   }
 }
-

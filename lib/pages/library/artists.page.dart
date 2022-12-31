@@ -19,19 +19,20 @@ import 'package:animations/animations.dart';
 
 class ArtistsPage extends StatefulWidget {
   PageController controller;
-  ArtistsPage({Key key, controller}) : this.controller = controller != null ? controller : new PageController(), super(key: key);
+  ArtistsPage({Key? key, controller})
+      : this.controller =
+            controller != null ? controller : new PageController(),
+        super(key: key);
 
   _ArtistsPageState createState() => _ArtistsPageState();
 }
 
-class _ArtistsPageState extends State<ArtistsPage> with AutomaticKeepAliveClientMixin<ArtistsPage> {
-
-
-
+class _ArtistsPageState extends State<ArtistsPage>
+    with AutomaticKeepAliveClientMixin<ArtistsPage> {
   final musicService = locator<MusicService>();
   final SettingService = locator<settingService>();
 
-  BehaviorSubject<Album> currentAlbum= new BehaviorSubject<Album>();
+  BehaviorSubject<Album> currentAlbum = new BehaviorSubject<Album>();
   ContainerTransitionType transitionType = ContainerTransitionType.fadeThrough;
 
   @override
@@ -40,20 +41,29 @@ class _ArtistsPageState extends State<ArtistsPage> with AutomaticKeepAliveClient
     var size = MediaQuery.of(context).size;
     double artistGridCellHeight = uiScaleService.ArtistGridCellHeight(size);
     return Container(
-      child:  StreamBuilder(
-        stream: Rx.combineLatest2(musicService.artists$, SettingService.getOrCreateSingleSettingStream(SettingsIds.SET_ALBUM_LIST_PAGE), (a, b) => MapEntry<List<Artist>, String>(a,b)),
+      child: StreamBuilder(
+        stream: Rx.combineLatest2(
+            musicService.artists$,
+            SettingService.getOrCreateSingleSettingStream(
+                SettingsIds.SET_ALBUM_LIST_PAGE),
+            (a, b) => MapEntry<List<Artist>, String>(a, b!)),
         builder: (BuildContext context,
-            AsyncSnapshot<MapEntry<List<Artist>,String>> snapshot) {
+            AsyncSnapshot<MapEntry<List<Artist>, String>> snapshot) {
           if (!snapshot.hasData) {
             return Container();
           }
-          if(snapshot.data.key.length==0){
+          if (snapshot.data!.key.length == 0) {
             return Container();
           }
-          final _artists = snapshot.data.key;
-          Map<LIST_PAGE_SettingsIds, String> UISettings = SettingService.DeserializeUISettings(snapshot.data.value);
-          int itemsPerRow = int.tryParse(UISettings[LIST_PAGE_SettingsIds.ARTISTS_PAGE_GRID_ROW_ITEM_COUNT])??3;
-          int animationDelay = int.tryParse(UISettings[LIST_PAGE_SettingsIds.ARTISTS_PAGE_BOX_FADE_IN_DURATION])??150;
+          final _artists = snapshot.data!.key;
+          Map<LIST_PAGE_SettingsIds, String>? UISettings =
+              SettingService.DeserializeUISettings(snapshot.data!.value);
+          int itemsPerRow = int.tryParse(UISettings![LIST_PAGE_SettingsIds
+                  .ARTISTS_PAGE_GRID_ROW_ITEM_COUNT] as String) ??
+              3;
+          int animationDelay = int.tryParse(UISettings[LIST_PAGE_SettingsIds
+                  .ARTISTS_PAGE_BOX_FADE_IN_DURATION] as String) ??
+              150;
           final double itemWidth = size.width / itemsPerRow;
           return GridView.builder(
             padding: EdgeInsets.all(0),
@@ -65,31 +75,34 @@ class _ArtistsPageState extends State<ArtistsPage> with AutomaticKeepAliveClient
               childAspectRatio: (itemWidth / (itemWidth + 50)),
             ),
             itemBuilder: (BuildContext context, int index) {
-              int newIndex = (index%itemsPerRow)+(itemsPerRow-1);
+              int newIndex = (index % itemsPerRow) + (itemsPerRow - 1);
               return GestureDetector(
                 onTap: () {
                   goToSingleArtistPage(_artists[index]);
                 },
                 child: ArtistGridCell(
                   _artists[index],
-                  ((artistGridCellHeight*0.75)/itemsPerRow)*3,
-                  artistGridCellHeight*0.25,
+                  ((artistGridCellHeight * 0.75) / itemsPerRow) * 3,
+                  artistGridCellHeight * 0.25,
                   choices: artistCardContextMenulist,
-                  animationDelay: (animationDelay*newIndex) - (index<6?((6-index)*150):0),
-                  useAnimation: animationDelay!=0,
-                  onContextSelect: (choice){
-                    switch(choice.id){
-                      case 1: {
-                        musicService.playAllArtistAlbums(_artists[index]);
-                        break;
-                      }
-                      case 2:{
-                        musicService.suffleAllArtistAlbums(_artists[index]);
-                        break;
-                      }
+                  animationDelay: (animationDelay * newIndex) -
+                      (index < 6 ? ((6 - index) * 150) : 0),
+                  useAnimation: animationDelay != 0,
+                  onContextSelect: (choice) {
+                    switch (choice.id) {
+                      case 1:
+                        {
+                          musicService.playAllArtistAlbums(_artists[index]);
+                          break;
+                        }
+                      case 2:
+                        {
+                          musicService.suffleAllArtistAlbums(_artists[index]);
+                          break;
+                        }
                     }
                   },
-                  onContextCancel: (choice){
+                  onContextCancel: (choice) {
                     print("Cancelled");
                   },
                   Screensize: size,
@@ -102,13 +115,13 @@ class _ArtistsPageState extends State<ArtistsPage> with AutomaticKeepAliveClient
     );
   }
 
-
-
-
-  void goToSingleArtistPage(Artist artist){
+  void goToSingleArtistPage(Artist artist) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SingleArtistPage(artist, heightToSubstract: 60,),
+        builder: (context) => SingleArtistPage(
+          artist,
+          heightToSubstract: 60,
+        ),
       ),
     );
   }
@@ -117,6 +130,4 @@ class _ArtistsPageState extends State<ArtistsPage> with AutomaticKeepAliveClient
   bool get wantKeepAlive {
     return true;
   }
-
-
 }

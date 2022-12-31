@@ -7,16 +7,17 @@ import 'package:Tunein/services/layout.dart';
 import 'package:Tunein/services/locator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:simple_permissions/simple_permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'services/locator.dart';
 import 'services/languageService.dart';
+
 Nano nano = Nano();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
-  PermissionStatus permission = await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
+  await Permission.storage.request();
+  PermissionStatus permission = await Permission.storage.request();
   print(permission);
   setupLocator();
   runApp(new MyApp());
@@ -53,28 +54,30 @@ class MyApp extends StatelessWidget {
 
 class Wrapper extends StatelessWidget {
   final Widget child;
-  Wrapper({Key key, this.child}) : super(key: key);
 
   final layoutService = locator<LayoutService>();
+
+  Wrapper({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return SlidingUpPanel(
-      panel: NowPlayingScreen(controller: layoutService.albumPlayerPageController),
+      panel:
+          NowPlayingScreen(controller: layoutService.albumPlayerPageController),
       controller: layoutService.globalPanelController,
       minHeight: 60,
       maxHeight: MediaQuery.of(context).size.height,
       backdropEnabled: true,
       backdropOpacity: 0.5,
       parallaxEnabled: true,
-        onPanelClosed:(){
-          layoutService.albumPlayerPageController.jumpToPage(1);
-        },
-        onPanelSlide: (value){
-          if(value>=0.3){
-            layoutService.onPanelOpen(value);
-          }
-        },
+      onPanelClosed: () {
+        layoutService.albumPlayerPageController.jumpToPage(1);
+      },
+      onPanelSlide: (value) {
+        if (value >= 0.3) {
+          layoutService.onPanelOpen(value);
+        }
+      },
       collapsed: Material(
         child: BottomPanel(),
       ),

@@ -13,69 +13,83 @@ import 'package:marquee/marquee.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MyCard extends StatelessWidget {
-  final Tune _song;
-  final VoidCallback onTap;
-  final VoidCallback onContextTap;
+  final Tune? _song;
+  final VoidCallback? onTap;
+  final VoidCallback? onContextTap;
   final musicService = locator<MusicService>();
-  final List<Color>colors;
-  final Color selectedBackgrundColor;
-  final Size ScreenSize;
-  final double StaticContextMenuFromBottom;
-  List<ContextMenuOptions> choices;
-  final void Function(ContextMenuOptions) onContextSelect;
-  final void Function(ContextMenuOptions) onContextCancel;
-  MyCard({Key key, @required Tune song, VoidCallback onTap, VoidCallback onContextTap, this.colors, @required this.choices, @required this.onContextCancel,
-    @required this.onContextSelect, this.ScreenSize, this.StaticContextMenuFromBottom, this.selectedBackgrundColor})
+  final List<Color>? colors;
+  final Color? selectedBackgrundColor;
+  final Size? ScreenSize;
+  final double? StaticContextMenuFromBottom;
+  List<ContextMenuOptions>? choices;
+  final void Function(ContextMenuOptions)? onContextSelect;
+  final void Function(ContextMenuOptions)? onContextCancel;
+
+  MyCard(
+      {Key? key,
+      required Tune song,
+      VoidCallback? onTap,
+      VoidCallback? onContextTap,
+      this.colors,
+      required this.choices,
+      required this.onContextCancel,
+      required this.onContextSelect,
+      this.ScreenSize,
+      this.StaticContextMenuFromBottom,
+      this.selectedBackgrundColor})
       : _song = song,
-        onTap=onTap,
-        onContextTap=onContextTap,
+        onTap = onTap,
+        onContextTap = onContextTap,
         super(key: key);
 
+  Widget? previousInstance;
+  PlayerState? previousState;
+  MapEntry<PlayerState, Tune?>? previousStreamEntry;
 
-  Widget previousInstance;
-  PlayerState previousState;
-  MapEntry<PlayerState, Tune> previousStreamEntry;
   @override
   Widget build(BuildContext context) {
-    Stream<MapEntry<PlayerState,Tune>> newStream = musicService.playerState$;
-    newStream= newStream.where((item){
-      if(previousStreamEntry==null){
-        previousStreamEntry= item;
+    Stream<MapEntry<PlayerState, Tune?>> newStream = musicService.playerState$;
+    newStream = newStream.where((item) {
+      if (previousStreamEntry == null) {
+        previousStreamEntry = item;
         return true;
-      }else{
+      } else {
         /*print("${(previousStreamEntry.value.id == item.value.id) && (previousStreamEntry.key!=item.key)}");
         print("id difference is : ${(previousStreamEntry.value.id == item.value.id) }");
         print("previous.key is : ${previousStreamEntry.key}  &&  next.key is : ${item.key}");*/
-        if((previousStreamEntry.value.id == item.value.id) && (previousStreamEntry.key!=item.key)){
+        if ((previousStreamEntry!.value?.id == item.value?.id) && (previousStreamEntry!.key != item.key)) {
           //no rebuild
-          previousStreamEntry= item;
+          previousStreamEntry = item;
           return false;
-        }else{
+        } else {
           //rebuild
-          previousStreamEntry= item;
+          previousStreamEntry = item;
           return true;
         }
       }
-
     });
     return StreamBuilder(
       stream: newStream,
-      builder: (BuildContext context,
-          AsyncSnapshot<MapEntry<PlayerState, Tune>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<MapEntry<PlayerState, Tune?>> snapshot) {
         //print("gona rebuild card");
         if (!snapshot.hasData) {
           return Container();
         }
-        final Tune _currentSong = snapshot.data.value;
-        final bool _isSelectedSong = _song.id == _currentSong.id;
-        final _textColor = _isSelectedSong ? colors!=null?colors[1]:Colors.white : colors!=null?colors[1].withAlpha(65):Colors.white54;
+        final Tune? _currentSong = snapshot.data!.value;
+        final bool _isSelectedSong = _song!.id == _currentSong?.id;
+        final _textColor = _isSelectedSong
+            ? colors != null
+                ? colors![1]
+                : Colors.white
+            : colors != null
+                ? colors![1].withAlpha(65)
+                : Colors.white54;
         final _fontWeight = _isSelectedSong ? FontWeight.w900 : FontWeight.w400;
 
-        if(!_isSelectedSong && previousInstance!=null){
-          return previousInstance;
-        }else{
-
-          if(!_isSelectedSong){
+        if (!_isSelectedSong && previousInstance != null) {
+          return previousInstance!;
+        } else {
+          if (!_isSelectedSong) {
             Widget newInstance = Container(
               color: Colors.transparent,
               padding: EdgeInsets.symmetric(vertical: 5),
@@ -88,9 +102,9 @@ class MyCard extends StatelessWidget {
                         color: Colors.transparent,
                         child: InkWell(
                           splashColor: MyTheme.darkgrey,
-                          child:Container(
+                          child: Container(
                             constraints: BoxConstraints.expand(),
-                            child:  Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 Padding(
@@ -102,11 +116,11 @@ class MyCard extends StatelessWidget {
                                       placeholder: AssetImage('images/track.png'),
                                       fadeInDuration: Duration(milliseconds: 200),
                                       fadeOutDuration: Duration(milliseconds: 100),
-                                      image: _song.albumArt != null
+                                      image: _song!.albumArt != null
                                           ? FileImage(
-                                        new File(_song.albumArt),
-                                      )
-                                          : AssetImage('images/track.png'),
+                                              File(_song!.albumArt!),
+                                            )
+                                          : AssetImage('images/track.png') as ImageProvider<Object>,
                                     ),
                                   ),
                                 ),
@@ -118,48 +132,43 @@ class MyCard extends StatelessWidget {
                                     children: <Widget>[
                                       Padding(
                                         padding: const EdgeInsets.only(bottom: 8),
-                                        child: (!_isSelectedSong || _song.title.length<25)?Text(
-                                          (_song.title == null)
-                                              ? "Unknon Title"
-                                              : _song.title,
-                                          overflow: TextOverflow.fade,
-                                          maxLines: 1,
-                                          textWidthBasis: TextWidthBasis.parent,
-                                          softWrap: false,
-                                          style: TextStyle(
-                                            fontSize: 13.5,
-                                            fontWeight: _fontWeight,
-                                            color: colors!=null?colors[1].withAlpha(200):Colors.white,
-                                          ),
-                                        ): Container(
-                                          height: 15,
-                                          child: Marquee(
-                                            text: (_song.title == null)
-                                                ? "Unknon Title"
-                                                : _song.title,
-                                            style: TextStyle(
-                                              fontSize: 13.5,
-                                              fontWeight: _fontWeight,
-                                              color: colors!=null?colors[1].withAlpha(200):Colors.white,
-                                            ),
-                                            scrollAxis: Axis.horizontal,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            blankSpace: _song.title.length*2.0,
-                                            velocity: (_song.title == null)?30.0:_song.title.length*1.2,
-                                            pauseAfterRound: Duration(seconds: (1+_song.title.length*0.110).floor()),
-                                            startPadding: 0.0,
-                                            accelerationDuration: Duration(milliseconds: (_song.title == null)?500:_song.title.length*40),
-                                            accelerationCurve: Curves.linear,
-                                            decelerationDuration: Duration(milliseconds: (_song.title == null)?500:_song.title.length*30),
-                                            decelerationCurve: Curves.easeOut,
-                                          ),
-                                        ),
-
+                                        child: (!_isSelectedSong || _song!.title!.length < 25)
+                                            ? Text(
+                                                (_song!.title == null) ? "Unknon Title" : _song!.title as String,
+                                                overflow: TextOverflow.fade,
+                                                maxLines: 1,
+                                                textWidthBasis: TextWidthBasis.parent,
+                                                softWrap: false,
+                                                style: TextStyle(
+                                                  fontSize: 13.5,
+                                                  fontWeight: _fontWeight,
+                                                  color: colors != null ? colors![1].withAlpha(200) : Colors.white,
+                                                ),
+                                              )
+                                            : Container(
+                                                height: 15,
+                                                child: Marquee(
+                                                  text: (_song!.title == null) ? "Unknon Title" : _song!.title!,
+                                                  style: TextStyle(
+                                                    fontSize: 13.5,
+                                                    fontWeight: _fontWeight,
+                                                    color: colors != null ? colors![1].withAlpha(200) : Colors.white,
+                                                  ),
+                                                  scrollAxis: Axis.horizontal,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  blankSpace: _song!.title!.length * 2.0,
+                                                  velocity: (_song!.title == null) ? 30.0 : _song!.title!.length * 1.2,
+                                                  pauseAfterRound: Duration(seconds: (1 + _song!.title!.length * 0.110).floor()),
+                                                  startPadding: 0.0,
+                                                  accelerationDuration: Duration(milliseconds: (_song!.title == null) ? 500 : _song!.title!.length * 40),
+                                                  accelerationCurve: Curves.linear,
+                                                  decelerationDuration: Duration(milliseconds: (_song!.title == null) ? 500 : _song!.title!.length * 30),
+                                                  decelerationCurve: Curves.easeOut,
+                                                ),
+                                              ),
                                       ),
                                       Text(
-                                        (_song.artist == null)
-                                            ? "Unknown Artist"
-                                            : _song.artist,
+                                        (_song!.artist == null) ? "Unknown Artist" : _song!.artist as String,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 12.5,
@@ -173,32 +182,34 @@ class MyCard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          onTap: (){
-                            onTap();
+                          onTap: () {
+                            onTap!();
                           },
                         ),
                       ),
                     ),
                     flex: 12,
                   ),
-                  choices!=null?ThreeDotPopupMenu(
-                    choices: choices,
-                    onContextSelect: onContextSelect,
-                    screenSize: ScreenSize,
-                    staticOffsetFromBottom: StaticContextMenuFromBottom,
-                  ):Container()
+                  choices != null
+                      ? ThreeDotPopupMenu(
+                          choices: choices,
+                          onContextSelect: onContextSelect!,
+                          screenSize: ScreenSize,
+                          staticOffsetFromBottom: StaticContextMenuFromBottom,
+                        )
+                      : Container()
                 ],
               ),
             );
             previousInstance = newInstance;
             return newInstance;
-          }else{
-            if(snapshot.data.key==previousState && previousState!=null){
-              return previousInstance;
-            }else{
+          } else {
+            if (snapshot.data!.key == previousState && previousState != null) {
+              return previousInstance!;
+            } else {
               Widget newInstance = Material(
-                color: _isSelectedSong?(selectedBackgrundColor!=null?selectedBackgrundColor:MyTheme.grey300).withAlpha(10):Colors.transparent,
-                elevation: _isSelectedSong?6:0,
+                color: _isSelectedSong ? (selectedBackgrundColor != null ? selectedBackgrundColor : MyTheme.grey300)!.withAlpha(10) : Colors.transparent,
+                elevation: _isSelectedSong ? 6 : 0,
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
                   child: Row(
@@ -210,9 +221,9 @@ class MyCard extends StatelessWidget {
                             color: Colors.transparent,
                             child: InkWell(
                               splashColor: MyTheme.darkgrey,
-                              child:Container(
+                              child: Container(
                                 constraints: BoxConstraints.expand(),
-                                child:  Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
                                     Padding(
@@ -224,11 +235,11 @@ class MyCard extends StatelessWidget {
                                           placeholder: AssetImage('images/track.png'),
                                           fadeInDuration: Duration(milliseconds: 200),
                                           fadeOutDuration: Duration(milliseconds: 100),
-                                          image: _song.albumArt != null
+                                          image: _song!.albumArt != null
                                               ? FileImage(
-                                            new File(_song.albumArt),
-                                          )
-                                              : AssetImage('images/track.png'),
+                                                  new File(_song!.albumArt!),
+                                                )
+                                              : AssetImage('images/track.png') as ImageProvider<Object>,
                                         ),
                                       ),
                                     ),
@@ -239,49 +250,44 @@ class MyCard extends StatelessWidget {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: <Widget>[
                                           Padding(
-                                            padding: EdgeInsets.only(bottom: (_isSelectedSong && _song.title.length>25)?3:8),
-                                            child: (!_isSelectedSong || _song.title.length<25)?Text(
-                                              (_song.title == null)
-                                                  ? "Unknon Title"
-                                                  : _song.title,
-                                              overflow: TextOverflow.fade,
-                                              maxLines: 1,
-                                              textWidthBasis: TextWidthBasis.parent,
-                                              softWrap: false,
-                                              style: TextStyle(
-                                                fontSize: 13.5,
-                                                fontWeight: _fontWeight,
-                                                color: colors!=null?colors[1].withAlpha(200):Colors.white,
-                                              ),
-                                            ): Container(
-                                              height: 19,
-                                              child: Marquee(
-                                                text: (_song.title == null)
-                                                    ? "Unknon Title"
-                                                    : _song.title,
-                                                style: TextStyle(
-                                                  fontSize: 13.5,
-                                                  fontWeight: _fontWeight,
-                                                  color: colors!=null?colors[1]:Colors.white,
-                                                ),
-                                                scrollAxis: Axis.horizontal,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                blankSpace: _song.title.length*2.0,
-                                                velocity: (_song.title == null)?30.0:_song.title.length*1.2,
-                                                pauseAfterRound: Duration(seconds: (1+_song.title.length*0.110).floor()),
-                                                startPadding: 0.0,
-                                                accelerationDuration: Duration(milliseconds: (_song.title == null)?500:_song.title.length*40),
-                                                accelerationCurve: Curves.linear,
-                                                decelerationDuration: Duration(milliseconds: (_song.title == null)?500:_song.title.length*30),
-                                                decelerationCurve: Curves.easeOut,
-                                              ),
-                                            ),
-
+                                            padding: EdgeInsets.only(bottom: (_isSelectedSong && _song!.title!.length > 25) ? 3 : 8),
+                                            child: (!_isSelectedSong || _song!.title!.length < 25)
+                                                ? Text(
+                                                    (_song!.title == null) ? "Unknon Title" : _song!.title as String,
+                                                    overflow: TextOverflow.fade,
+                                                    maxLines: 1,
+                                                    textWidthBasis: TextWidthBasis.parent,
+                                                    softWrap: false,
+                                                    style: TextStyle(
+                                                      fontSize: 13.5,
+                                                      fontWeight: _fontWeight,
+                                                      color: colors != null ? colors![1].withAlpha(200) : Colors.white,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    height: 19,
+                                                    child: Marquee(
+                                                      text: (_song!.title == null) ? "Unknon Title" : _song!.title!,
+                                                      style: TextStyle(
+                                                        fontSize: 13.5,
+                                                        fontWeight: _fontWeight,
+                                                        color: colors != null ? colors![1] : Colors.white,
+                                                      ),
+                                                      scrollAxis: Axis.horizontal,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      blankSpace: _song!.title!.length * 2.0,
+                                                      velocity: (_song!.title == null) ? 30.0 : _song!.title!.length * 1.2,
+                                                      pauseAfterRound: Duration(seconds: (1 + _song!.title!.length * 0.110).floor()),
+                                                      startPadding: 0.0,
+                                                      accelerationDuration: Duration(milliseconds: (_song!.title == null) ? 500 : _song!.title!.length * 40),
+                                                      accelerationCurve: Curves.linear,
+                                                      decelerationDuration: Duration(milliseconds: (_song!.title == null) ? 500 : _song!.title!.length * 30),
+                                                      decelerationCurve: Curves.easeOut,
+                                                    ),
+                                                  ),
                                           ),
                                           Text(
-                                            (_song.artist == null)
-                                                ? "Unknown Artist"
-                                                : _song.artist,
+                                            (_song!.artist == null) ? "Unknown Artist" : _song!.artist as String,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               fontSize: 12.5,
@@ -295,20 +301,22 @@ class MyCard extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              onTap: (){
-                                onTap();
+                              onTap: () {
+                                onTap!();
                               },
                             ),
                           ),
                         ),
                         flex: 12,
                       ),
-                      choices!=null?ThreeDotPopupMenu(
-                        choices: choices,
-                        onContextSelect: onContextSelect,
-                        screenSize: ScreenSize,
-                        staticOffsetFromBottom: StaticContextMenuFromBottom,
-                      ):Container()
+                      choices != null
+                          ? ThreeDotPopupMenu(
+                              choices: choices!,
+                              onContextSelect: onContextSelect!,
+                              screenSize: ScreenSize!,
+                              staticOffsetFromBottom: StaticContextMenuFromBottom!,
+                            )
+                          : Container()
                     ],
                   ),
                 ),
@@ -320,8 +328,4 @@ class MyCard extends StatelessWidget {
       },
     );
   }
-
-
 }
-
-

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import '../globals.dart';
 
 class BottomNavBar extends StatefulWidget {
-  BottomNavBar({Key key}) : super(key: key);
+  BottomNavBar({Key? key}) : super(key: key);
 
   _BottomNavBarState createState() => _BottomNavBarState();
 }
@@ -30,18 +30,20 @@ class _BottomNavBarState extends State<BottomNavBar> {
       iconSize: 22,
       items: bottomNavBarItems
           .map((item) => BottomNavigationBarItem(
-              backgroundColor: MyTheme.bgBottomBar,
-              icon: item.value,
-              title: Padding(
-                padding: const EdgeInsets.only(top :5.0),
-                child: Text(
-                  item.key.toUpperCase(),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                  ),
-                ),
-              )))
+                backgroundColor: MyTheme.bgBottomBar,
+                icon: item.value,
+                label: item.key.toUpperCase(),
+                //   Padding(
+                //   padding: const EdgeInsets.only(top :5.0),
+                //   child: Text(
+                //     item.key.toUpperCase(),
+                //     style: TextStyle(
+                //       fontWeight: FontWeight.bold,
+                //       fontSize: 10,
+                //     ),
+                //   ),
+                // )
+              ))
           .toList(),
     );
   }
@@ -60,7 +62,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     );
   }
 
-  _opeSettingsPage(){
+  _opeSettingsPage() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => SettingsPage(),

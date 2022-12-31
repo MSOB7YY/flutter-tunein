@@ -28,21 +28,21 @@ import 'package:Tunein/components/ArtistCell.dart';
 import 'package:Tunein/services/dialogService.dart';
 
 class SingleArtistPage extends StatelessWidget {
-
   Artist artist;
   double heightToSubstract;
   final musicService = locator<MusicService>();
   final themeService = locator<ThemeService>();
 
-
-  SingleArtistPage(this.artist,{this.heightToSubstract=0});
+  SingleArtistPage(this.artist, {this.heightToSubstract = 0});
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     double definitionBarHeight = uiScaleService.AlbumArtistInfoPage(size);
     final double itemWidth = size.width / 3;
-    List<int> bgColor=(artist.colors!=null && artist.colors.length!=0)?artist.colors:themeService.defaultColors;
+    List<int?> bgColor = (artist.colors != null && artist.colors.length != 0)
+        ? artist.colors
+        : themeService.defaultColors;
     return new Container(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -50,7 +50,9 @@ class SingleArtistPage extends StatelessWidget {
           Material(
             child: Container(
               child: new Container(
-                margin: MediaQuery.of(context).padding.add(EdgeInsets.only(right: 10, left: 10)),
+                margin: MediaQuery.of(context)
+                    .padding
+                    .add(EdgeInsets.only(right: 10, left: 10)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -62,9 +64,10 @@ class SingleArtistPage extends StatelessWidget {
                           fadeOutDuration: Duration(milliseconds: 100),
                           image: artist.coverArt != null
                               ? FileImage(
-                            new File(artist.coverArt),
-                          )
-                              : AssetImage('images/artist.jpg'),
+                                  new File(artist.coverArt!),
+                                )
+                              : AssetImage('images/artist.jpg')
+                                  as ImageProvider<Object>,
                         ),
                       ),
                       flex: 4,
@@ -88,13 +91,15 @@ class SingleArtistPage extends StatelessWidget {
                                     child: Text(
                                       (artist.name == null)
                                           ? "Unknon Artist"
-                                          : artist.name,
+                                          : artist.name as String,
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 2,
                                       style: TextStyle(
                                         fontSize: 17.5,
                                         fontWeight: FontWeight.w700,
-                                        color: bgColor!=null?Color(bgColor[2]).withAlpha(200):Colors.white,
+                                        color: bgColor != null
+                                            ? Color(bgColor[2]!).withAlpha(200)
+                                            : Colors.white,
                                       ),
                                     ),
                                   ),
@@ -108,13 +113,17 @@ class SingleArtistPage extends StatelessWidget {
                                         splashColor: MyTheme.darkgrey,
                                         radius: 30.0,
                                         child: Padding(
-                                            padding: const EdgeInsets.only(right: 10.0),
-                                            child:Icon(
-                                              IconData(0xea7c, fontFamily: 'boxicons'),
+                                            padding: const EdgeInsets.only(
+                                                right: 10.0),
+                                            child: Icon(
+                                              IconData(0xea7c,
+                                                  fontFamily: 'boxicons'),
                                               size: 22,
-                                              color: bgColor!=null?Color(bgColor[2]).withAlpha(200):Colors.white70,
-                                            )
-                                        ),
+                                              color: bgColor != null
+                                                  ? Color(bgColor[2]!)
+                                                      .withAlpha(200)
+                                                  : Colors.white70,
+                                            )),
                                       ),
                                     ),
                                     elevation: 3.2,
@@ -122,21 +131,27 @@ class SingleArtistPage extends StatelessWidget {
                                       print('You have not chosen anything');
                                     },
                                     tooltip: 'Playing options',
-                                    onSelected: (ContextMenuOptions choice){
-                                      switch(choice.id){
-                                        case 1: {
-                                          musicService.playAllArtistAlbums(artist);
-                                          break;
-                                        }
-                                        case 2:{
-                                          musicService.suffleAllArtistAlbums(artist);
-                                          break;
-                                        }
+                                    onSelected: (ContextMenuOptions choice) {
+                                      switch (choice.id) {
+                                        case 1:
+                                          {
+                                            musicService
+                                                .playAllArtistAlbums(artist);
+                                            break;
+                                          }
+                                        case 2:
+                                          {
+                                            musicService
+                                                .suffleAllArtistAlbums(artist);
+                                            break;
+                                          }
                                       }
                                     },
                                     itemBuilder: (BuildContext context) {
-                                      return artistCardContextMenulist.map((ContextMenuOptions choice) {
-                                        return PopupMenuItem<ContextMenuOptions>(
+                                      return artistCardContextMenulist
+                                          .map((ContextMenuOptions choice) {
+                                        return PopupMenuItem<
+                                            ContextMenuOptions>(
                                           value: choice,
                                           child: Text(choice.title),
                                         );
@@ -146,28 +161,31 @@ class SingleArtistPage extends StatelessWidget {
                                   color: Colors.transparent,
                                 )
                               ],
-
                             ),
                             Text(
                               (artist.albums.length == 0)
                                   ? "No Albums"
-                                  : "${artist.albums.length} ${artist.albums.length>1?"albums":"album"}",
+                                  : "${artist.albums.length} ${artist.albums.length > 1 ? "albums" : "album"}",
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w400,
-                                color: bgColor!=null?Color(bgColor[2]).withAlpha(200):Colors.white,
+                                color: bgColor != null
+                                    ? Color(bgColor[2]!).withAlpha(200)
+                                    : Colors.white,
                               ),
                             ),
                             Text(
                               (artist.albums.length == 0)
                                   ? "No Songs"
-                                  : "${countSongsInAlbums(artist.albums)} ${countSongsInAlbums(artist.albums)>1?"songs":"song"}",
+                                  : "${countSongsInAlbums(artist.albums)} ${countSongsInAlbums(artist.albums) > 1 ? "songs" : "song"}",
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w400,
-                                color: bgColor!=null?Color(bgColor[2]).withAlpha(150):Colors.white,
+                                color: bgColor != null
+                                    ? Color(bgColor[2]!).withAlpha(150)
+                                    : Colors.white,
                               ),
                             ),
                             Container(
@@ -180,7 +198,9 @@ class SingleArtistPage extends StatelessWidget {
                                     child: Text(
                                       "${Duration(milliseconds: sumDurationsofArtist(artist).floor()).inMinutes} min",
                                       style: TextStyle(
-                                        color: bgColor!=null?Color(bgColor[2]):Colors.white70,
+                                        color: bgColor != null
+                                            ? Color(bgColor[2]!)
+                                            : Colors.white70,
                                         fontWeight: FontWeight.w700,
                                         fontSize: 14,
                                       ),
@@ -189,7 +209,9 @@ class SingleArtistPage extends StatelessWidget {
                                   ),
                                   Icon(
                                     Icons.access_time,
-                                    color: bgColor!=null?Color(bgColor[2]):Colors.white70,
+                                    color: bgColor != null
+                                        ? Color(bgColor[2]!)
+                                        : Colors.white70,
                                   )
                                 ],
                               ),
@@ -204,14 +226,14 @@ class SingleArtistPage extends StatelessWidget {
                 ),
               ),
               height: definitionBarHeight,
-              color: bgColor!=null?Color(bgColor[0]):MyTheme.bgBottomBar,
+              color: bgColor != null ? Color(bgColor[0]!) : MyTheme.bgBottomBar,
             ),
           ),
           Flexible(
             child: ShowWithFade(
               child: Container(
                 padding: EdgeInsets.only(left: 5),
-                height: size.height-definitionBarHeight-heightToSubstract,
+                height: size.height - definitionBarHeight - heightToSubstract,
                 color: MyTheme.bgBottomBar,
                 child: CustomScrollView(
                   scrollDirection: Axis.vertical,
@@ -225,77 +247,86 @@ class SingleArtistPage extends StatelessWidget {
                           children: <Widget>[
                             ItemListDevider(DeviderTitle: "More choices"),
                             Container(
-                              color:MyTheme.bgBottomBar,
+                              color: MyTheme.bgBottomBar,
                               height: 120,
                               child: ListView.builder(
                                 itemExtent: 180,
                                 itemCount: 1,
-                                cacheExtent:MediaQuery.of(context).size.width ,
+                                cacheExtent: MediaQuery.of(context).size.width,
                                 addAutomaticKeepAlives: true,
                                 shrinkWrap: false,
-
                                 scrollDirection: Axis.horizontal,
-
-                                itemBuilder: (context, index){
-                                  String uniqueID = "MP${artist.coverArt??artist.name.split(" ").join()}";
+                                itemBuilder: (context, index) {
+                                  String uniqueID =
+                                      "MP${artist.coverArt ?? artist.name!.split(" ").join()}";
                                   return MoreOptionsCard(
                                     uniqueID: uniqueID,
-                                    backgroundWidget: memoryCacheService.isItemCached(uniqueID)?
-                                    Image.memory(memoryCacheService.getCacheItem(uniqueID)):null,
+                                    backgroundWidget: memoryCacheService
+                                            .isItemCached(uniqueID)
+                                        ? Image.memory(memoryCacheService
+                                            .getCacheItem(uniqueID))
+                                        : null,
                                     imageUri: artist.coverArt,
-                                    colors: artist.colors,
+                                    colors: artist.colors as List<int>?,
                                     bottomTitle: "Most Played",
-                                    onPlayPressed: (){
-                                      musicService.playMostPlayedOfArtist(artist);
+                                    onPlayPressed: () {
+                                      musicService
+                                          .playMostPlayedOfArtist(artist);
                                     },
-                                    onSavePressed: () async{
+                                    onSavePressed: () async {
                                       Playlist newPlaylsit = Playlist(
                                           "Most played of ${artist.name}",
-                                          musicService.getMostPlayedOfArtist(artist),
+                                          musicService
+                                              .getMostPlayedOfArtist(artist),
                                           PlayerState.stopped,
-                                          null
-                                      );
+                                          null);
+
                                       /// This is a temporary way fo handling until we incorporate the name changing in playlists
                                       /// The better way is that the passed playlist gets modified inside the dialog return function and then is returned
                                       /// instead of the listofSongsToBeDeleted TODO
-                                      List<Tune> songsToBeDeleted = await openEditPlaylistBeforeSaving(context, newPlaylsit);
+                                      List<Tune>? songsToBeDeleted =
+                                          await openEditPlaylistBeforeSaving(
+                                              context, newPlaylsit);
 
-                                      if(songsToBeDeleted!=null){
-                                        if(songsToBeDeleted.length!=0){
-                                          List<String> idList = songsToBeDeleted.map((elem)=>elem.id);
-                                          newPlaylsit.songs.removeWhere((elem){
+                                      if (songsToBeDeleted != null) {
+                                        if (songsToBeDeleted.length != 0) {
+                                          List<String> idList = songsToBeDeleted
+                                                  .map((elem) => elem.id)
+                                              as List<String>;
+                                          newPlaylsit.songs!
+                                              .removeWhere((elem) {
                                             return idList.contains(elem.id);
                                           });
                                         }
-                                        musicService.addPlaylist(newPlaylsit).then(
-                                                (data){
-                                              DialogService.showFlushbar(context,
-                                                  leftIcon: Icon(Icons.check_circle,
-                                                    color: Color(bgColor[0]).withAlpha(255),
-                                                    size: 27,
-                                                  ),
-                                                  showDuration: Duration(milliseconds: 1500),
-                                                  color: Color(bgColor[2]),
-                                                  messageText: Text("Playlist : ${"Most played of ${newPlaylsit.name}"} has been saved",
-                                                    style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight: FontWeight.w600,
-                                                        color: Color(bgColor[0])
-                                                    ),
-                                                  ),
-                                                  titleText: Text("Playlist Saved",
-                                                    style: TextStyle(
-                                                        fontSize: 17,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Color(bgColor[0])
-                                                    ),
-                                                  )
-                                              );
-                                            }
-                                        );
+                                        musicService
+                                            .addPlaylist(newPlaylsit)
+                                            .then((data) {
+                                          DialogService.showFlushbar(context,
+                                              leftIcon: Icon(
+                                                Icons.check_circle,
+                                                color: Color(bgColor[0]!)
+                                                    .withAlpha(255),
+                                                size: 27,
+                                              ),
+                                              showDuration:
+                                                  Duration(milliseconds: 1500),
+                                              color: Color(bgColor[2]!),
+                                              messageText: Text(
+                                                "Playlist : ${"Most played of ${newPlaylsit.name}"} has been saved",
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Color(bgColor[0]!)),
+                                              ),
+                                              titleText: Text(
+                                                "Playlist Saved",
+                                                style: TextStyle(
+                                                    fontSize: 17,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: Color(bgColor[0]!)),
+                                              ));
+                                        });
                                       }
-
-
                                     },
                                   );
                                 },
@@ -316,8 +347,7 @@ class SingleArtistPage extends StatelessWidget {
                             color: Colors.transparent,
                           ),
                           minHeight: 35,
-                          maxHeight: 35
-                      ),
+                          maxHeight: 35),
                       pinned: true,
                     ),
                     SliverGrid(
@@ -327,42 +357,54 @@ class SingleArtistPage extends StatelessWidget {
                         crossAxisSpacing: 3,
                         childAspectRatio: (itemWidth / (itemWidth + 50)),
                       ),
-                      delegate: SliverChildBuilderDelegate((context, index){
-                        int newIndex = (index%3)+2;
-                        double albumGridCellHeight = uiScaleService.AlbumsGridCellHeight(size);
-                        return GestureDetector(
-                          onTap: () {
-                            goToSingleArtistPage(context, artist.albums[index]);
-                          },
-                          child: Material( // the material widget here helps with the themes
-                            //the non inclusion of it means you get double bars underneath the text
-                            //this is not a must but you need to find a way to give a theme to your widget
-                            //Material widget is the easiest and the one i am using in this app
-                            child: AlbumGridCell(artist.albums[index],albumGridCellHeight*0.8,albumGridCellHeight*0.2,
-                              animationDelay: (50*newIndex) - (index<6?((6-index)*160):0),
-                              useAnimation:true,
-                              choices: albumCardContextMenulist,
-                              onContextSelect: (choice){
-                                switch(choice.id){
-                                  case 1: {
-                                    musicService.playEntireAlbum(artist.albums[index]);
-                                    break;
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          int newIndex = (index % 3) + 2;
+                          double albumGridCellHeight =
+                              uiScaleService.AlbumsGridCellHeight(size);
+                          return GestureDetector(
+                            onTap: () {
+                              goToSingleArtistPage(
+                                  context, artist.albums[index]);
+                            },
+                            child: Material(
+                              // the material widget here helps with the themes
+                              //the non inclusion of it means you get double bars underneath the text
+                              //this is not a must but you need to find a way to give a theme to your widget
+                              //Material widget is the easiest and the one i am using in this app
+                              child: AlbumGridCell(
+                                artist.albums[index],
+                                albumGridCellHeight * 0.8,
+                                albumGridCellHeight * 0.2,
+                                animationDelay: (50 * newIndex) -
+                                    (index < 6 ? ((6 - index) * 160) : 0),
+                                useAnimation: true,
+                                choices: albumCardContextMenulist,
+                                onContextSelect: (choice) {
+                                  switch (choice.id) {
+                                    case 1:
+                                      {
+                                        musicService.playEntireAlbum(
+                                            artist.albums[index]);
+                                        break;
+                                      }
+                                    case 2:
+                                      {
+                                        musicService.shuffleEntireAlbum(
+                                            artist.albums[index]);
+                                        break;
+                                      }
                                   }
-                                  case 2:{
-                                    musicService.shuffleEntireAlbum(artist.albums[index]);
-                                    break;
-                                  }
-                                }
-                              },
-                              Screensize: size,
-                              onContextCancel: (option){
-                                print("cenceled");
-                              },
+                                },
+                                Screensize: size,
+                                onContextCancel: (option) {
+                                  print("cenceled");
+                                },
+                              ),
+                              color: Colors.transparent,
                             ),
-                            color: Colors.transparent,
-                          ),
-                        );
-                      },
+                          );
+                        },
                         childCount: artist.albums.length,
                       ),
                     )
@@ -380,61 +422,59 @@ class SingleArtistPage extends StatelessWidget {
     );
   }
 
-  int countSongsInAlbums(List<Album> albums){
-    int count=0;
-    albums.forEach((elem){
-      count+=elem.songs.length;
+  int countSongsInAlbums(List<Album> albums) {
+    int count = 0;
+    albums.forEach((elem) {
+      count += elem.songs.length;
     });
     return count;
   }
 
-
   double sumDurationsofArtist(Artist artist) {
     double FinalDuration = 0;
 
-    artist.albums.forEach((album){
+    artist.albums.forEach((album) {
       album.songs.forEach((elem) {
-        FinalDuration += elem.duration;
+        FinalDuration += elem.duration!;
       });
     });
 
     return FinalDuration;
   }
 
-
-  Future<List<Tune>> openEditPlaylistBeforeSaving(context,Playlist playlist) async{
-    String keyword="";
-    List<Tune> songsToBeDeleted=[];
-    List<Artist> selectedArtists=List<Artist>();
+  Future<List<Tune>?> openEditPlaylistBeforeSaving(
+      context, Playlist playlist) async {
+    String keyword = "";
+    List<Tune> songsToBeDeleted = [];
+    List<Artist> selectedArtists = <Artist>[];
     return showDialog(
         context: context,
         builder: (_) {
           return AlertDialog(
             backgroundColor: MyTheme.darkBlack,
             title: Text(
-              "Editing Playlist${playlist!=null?" : "+playlist.name:""}",
-              style: TextStyle(
-                  color: Colors.white70
-              ),
+              "Editing Playlist${playlist != null ? " : " + playlist.name! : ""}",
+              style: TextStyle(color: Colors.white70),
             ),
             content: Container(
-              height: MediaQuery.of(context).size.height/2.5,
-              width: MediaQuery.of(context).size.width/1.2,
+              height: MediaQuery.of(context).size.height / 2.5,
+              width: MediaQuery.of(context).size.width / 1.2,
               child: GridView.builder(
                 padding: EdgeInsets.all(3),
-                itemBuilder: (context, index){
-                  Tune songs = playlist.songs[index];
+                itemBuilder: (context, index) {
+                  Tune songs = playlist.songs![index];
                   return SelectableTile(
                     imageUri: songs.albumArt,
                     title: songs.title,
                     isSelected: true,
                     selectedBackgroundColor: MyTheme.darkRed,
-                    onTap: (willItBeSelected){
+                    onTap: (willItBeSelected) {
                       print("Selected ${songs.title}");
-                      if(willItBeSelected){
+                      if (willItBeSelected) {
                         songsToBeDeleted.add(songs);
-                      }else{
-                        songsToBeDeleted.removeAt(songsToBeDeleted.indexWhere((elem)=>elem.title==songs.title));
+                      } else {
+                        songsToBeDeleted.removeAt(songsToBeDeleted
+                            .indexWhere((elem) => elem.title == songs.title));
                       }
                     },
                     placeHolderAssetUri: "images/track.png",
@@ -446,40 +486,38 @@ class SingleArtistPage extends StatelessWidget {
                   crossAxisSpacing: 2.5,
                   childAspectRatio: 3,
                 ),
-                semanticChildCount: playlist.songs.length,
+                semanticChildCount: playlist.songs!.length,
                 cacheExtent: 120,
-                itemCount: playlist.songs.length,
+                itemCount: playlist.songs!.length,
               ),
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text(
                   "Save Playlist",
-                  style: TextStyle(
-                      color: MyTheme.darkRed
-                  ),
+                  style: TextStyle(color: MyTheme.darkRed),
                 ),
-                onPressed: (){
-                  Navigator.of(context, rootNavigator: true).pop(songsToBeDeleted);
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(songsToBeDeleted);
                 },
               ),
-              FlatButton(
+              TextButton(
                   child: Text(
                     "Cancel",
-                    style: TextStyle(
-                        color: MyTheme.darkRed
-                    ),
+                    style: TextStyle(color: MyTheme.darkRed),
                   ),
-                  onPressed: () => Navigator.of(context, rootNavigator: true).pop())
+                  onPressed: () =>
+                      Navigator.of(context, rootNavigator: true).pop())
             ],
           );
         });
   }
 
-  void goToSingleArtistPage(context, Album album){
+  void goToSingleArtistPage(context, Album album) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SingleAlbumPage(null,album:album),
+        builder: (context) => SingleAlbumPage(null, album: album),
       ),
     );
   }

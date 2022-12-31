@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 
 class PageNavHeader extends StatefulWidget {
   final int pageIndex;
-  PageNavHeader({Key key, this.pageIndex}) : super(key: key);
+
+  PageNavHeader({super.key, required this.pageIndex});
 
   _PageNavHeaderState createState() => _PageNavHeaderState();
 }
@@ -36,7 +37,7 @@ class _PageNavHeaderState extends State<PageNavHeader> {
               controller:
                   layoutService.pageServices[widget.pageIndex].headerController,
               scrollDirection: Axis.horizontal,
-              itemCount: headerItems[widget.pageIndex].length,
+              itemCount: headerItems[widget.pageIndex]!.length,
               itemBuilder: (context, int index) {
                 var items = headerItems[widget.pageIndex];
                 // if (index == items.length) {
@@ -47,7 +48,7 @@ class _PageNavHeaderState extends State<PageNavHeader> {
                 return PageTitle(
                   pageIndex: widget.pageIndex,
                   index: index,
-                  key: items[index].value,
+                  key: items![index].value,
                   title: items[index].key.toUpperCase(),
                 );
               },

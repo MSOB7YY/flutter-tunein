@@ -14,9 +14,9 @@ import 'package:uuid/uuid.dart';
 import 'package:path/path.dart';
 import 'package:Tunein/services/locator.dart';
 import 'package:Tunein/services/isolates/musicServiceIsolate.dart';
-import 'package:ext_storage/ext_storage.dart';
-class Nano {
 
+// import 'package:ext_storage/ext_storage.dart';
+class Nano {
   // used for app
   List _metaData = [];
   List _musicFiles = [];
@@ -44,10 +44,12 @@ class Nano {
   }
 
   Future getSdCardPath() async {
-    String value;
+    String value = "";
     try {
       value = await TuneinImageUtilsPlugin.getSdCardPath();
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
     //memoryCachingService.setCacheItem(CachedItems.SDCARD_NAME, value.split("/").last);
     return value;
   }
@@ -70,16 +72,16 @@ class Nano {
   }
 
   Future<dynamic> readExtDir(Directory dir) async {
-    return StandardIsolateFunctions.readExtDir(dir,(dataPath){
-      if(dataPath!="0001"){
+    return StandardIsolateFunctions.readExtDir(dir, (dataPath) {
+      if (dataPath != "0001") {
         _musicFiles.add(dataPath);
       }
     });
   }
 
-  bool validateMusicFile(String path){
+  bool validateMusicFile(String path) {
     String filename = basename(path);
-    if(filename.startsWith(new RegExp(r'([_.\-\!\?])'))){
+    if (filename.startsWith(new RegExp(r'([_.\-\!\?])'))) {
       return false;
     }
     return true;
@@ -87,8 +89,9 @@ class Nano {
 
   Future<void> getMusicFiles() async {
     //Directory ext = await getExternalStorageDirectory();
-    String ext = await ExtStorage.getExternalStorageDirectory();
-    await readExtDir(Directory(ext));
+
+    // String ext = await ExtStorage.getExternalStorageDirectory();
+    // await readExtDir(Directory(ext));
     String sdPath = await getSdCardPath();
     if (sdPath == null) {
       print("NO SDCARD ON THIS DEVICE");
@@ -99,13 +102,14 @@ class Nano {
   }
 
   Future getAllMetaData() async {
-    _metaData = await PluginIsolateFunctions.fetchMetadataOfAllTracks(List.from(_musicFiles));
+    _metaData = await PluginIsolateFunctions.fetchMetadataOfAllTracks(
+        List.from(_musicFiles));
     return;
   }
 
   void cleanMetadata() {
     for (var i = 0; i < _musicFiles.length; i++) {
-      if(_metaData[i]==null) continue;
+      if (_metaData[i] == null) continue;
       if (_metaData[i][0] == null) {
         String s = _musicFiles[i];
         for (var n = s.length; n > 0; n--) {
@@ -145,26 +149,25 @@ class Nano {
 
   Future<List<Tune>> fetchSongs() async {
     String appPath = await getLocalPath();
-    List<Tune> tunes = List<Tune>();
+    List<Tune> tunes = [];
     await getMusicFiles();
     await getAllMetaData();
     cleanMetadata();
     for (var i = 0; i < _musicFiles.length; i++) {
-      if(_metaData[i]==null)continue;
+      if (_metaData[i] == null) continue;
       var albumArt = getImage(appPath, _metaData[i][2]);
       Tune tune = Tune(
-          uuid.v1(),
-          _metaData[i][0],
-          _metaData[i][1],
-          _metaData[i][3],
-          int.parse((_metaData[i][5]).toString()),
-          _musicFiles[i],
-          albumArt,
-          [],
-          int.parse(_metaData[i][4]),
-          _metaData[i][6],
-          _metaData[i][7],
-
+        uuid.v1(),
+        _metaData[i][0],
+        _metaData[i][1],
+        _metaData[i][3],
+        int.parse((_metaData[i][5]).toString()),
+        _musicFiles[i],
+        albumArt,
+        [],
+        int.parse(_metaData[i][4]),
+        _metaData[i][6],
+        _metaData[i][7],
       );
       tunes.add(tune);
     }
@@ -174,17 +177,17 @@ class Nano {
 }
 
 class Tune {
-  String id;
-  String title;
-  String artist;
-  String album;
-  int duration;
-  String uri;
-  String albumArt;
-  int numberInAlbum;
-  String genre;
-  String year;
-  List<int> colors;
+  String? id;
+  String? title;
+  String? artist;
+  String? album;
+  int? duration;
+  String? uri;
+  String? albumArt;
+  int? numberInAlbum;
+  String? genre;
+  String? year;
+  List<int>? colors;
 
   Tune(this.id, this.title, this.artist, this.album, this.duration, this.uri,
       this.albumArt, this.colors, this.numberInAlbum, this.genre, this.year);
@@ -197,16 +200,16 @@ class Tune {
     uri = m["uri"];
     albumArt = m["albumArt"];
     numberInAlbum = m["numberInAlbum"];
-    List<int> colorList =[];
-    (m["colors"] as List).forEach((colorElem){
-      colorList.add(int.tryParse(colorElem.toString()));
+    List<int> colorList = [];
+    (m["colors"] as List).forEach((colorElem) {
+      colorList.add(int.tryParse(colorElem.toString())!);
     });
     colors = colorList;
-    genre= m["genre"];
-    year=m["year"];
+    genre = m["genre"];
+    year = m["year"];
   }
 
-  Map toMap(){
+  Map toMap() {
     Map<String, dynamic> _map = {};
     _map["album"] = this.album;
     _map["id"] = this.id;
@@ -223,32 +226,31 @@ class Tune {
   }
 }
 
-
 class Album {
-  int id;
-  String title;
-  String artist;
-  String albumArt;
-  List<Tune> songs=[];
+  late int id;
+  String? title;
+  String? artist;
+  String? albumArt;
+  late List<Tune> songs = [];
   Album(this.id, this.title, this.artist, this.albumArt);
 
   Album.fromMap(Map m) {
-    id= m["id"];
+    id = m["id"];
     artist = m["artist"];
     title = m["title"];
     albumArt = m["albumArt"];
     List<Tune> albumSongs = [];
-    (m["songs"] as List).forEach((element){
+    (m["songs"] as List).forEach((element) {
       albumSongs.add(Tune.fromMap(element));
     });
-    songs=albumSongs;
+    songs = albumSongs;
   }
 
-  Map toMap(Album album){
+  Map toMap(Album album) {
     Map<String, dynamic> _map = {};
     //transforming the song list to a decodable format
-    List<Map> newSongsMap=[];
-    album.songs.forEach((song){
+    List<Map> newSongsMap = [];
+    album.songs.forEach((song) {
       Map songAsAMap = song.toMap();
       newSongsMap.add(songAsAMap);
     });
@@ -265,44 +267,41 @@ class Album {
   String toString() {
     return 'Album{id: $id, title: $title, artist: $artist, albumArt: $albumArt, songs: $songs}';
   }
-
 }
 
-
 class Artist {
-  int id;
-  String name;
-  String coverArt;
-  List<Album> albums=[];
-  List<int> colors=List<int>();
-  Map<String,String> apiData=Map<String,String>();
-  String genre;
+  int? id;
+  String? name;
+  String? coverArt;
+  late List<Album> albums = [];
+  late List<int?> colors = [];
+  late Map<String, String> apiData = Map<String, String>();
+  String? genre;
   Artist(this.id, this.name, this.coverArt, this.genre);
 
   Artist.fromMap(Map m) {
-    id= m["id"];
+    id = m["id"];
     name = m["name"];
     coverArt = m["coverArt"];
-    List<Album> albumsList=[];
-    (m["albums"] as List).forEach((AlbumMap){
+    List<Album> albumsList = [];
+    (m["albums"] as List).forEach((AlbumMap) {
       albumsList.add(Album.fromMap(AlbumMap));
     });
-    albums=albumsList;
-    apiData=Map<String, String>.from(m["apiData"]);
-    List<int> colorList =[];
-    (m["colors"] as List).forEach((colorElem){
-      colorList.add(int.tryParse(colorElem.toString()));
+    albums = albumsList;
+    apiData = Map<String, String>.from(m["apiData"]);
+    List<int?> colorList = [];
+    (m["colors"] as List).forEach((colorElem) {
+      colorList.add(int.tryParse(colorElem!.toString()));
     });
-    colors=colorList;
-    genre= m["genre"];
+    colors = colorList;
+    genre = m["genre"];
   }
 
-
-  Map toMap(Artist artist){
+  Map toMap(Artist artist) {
     Map<String, dynamic> _map = {};
     //transforming the song list to a decodable format
-    List<Map> newAlbumsMap=[];
-    artist.albums.forEach((album){
+    List<Map> newAlbumsMap = [];
+    artist.albums.forEach((album) {
       newAlbumsMap.add(album.toMap(album));
     });
 
@@ -320,70 +319,70 @@ class Artist {
   String toString() {
     return 'Artist{id: $id, name: $name, coverArt: $coverArt, albums: $albums, apiData :$apiData}';
   }
-
-
-
 }
 
 class Playlist {
-  Uuid uuid = new Uuid();
-  String id;
-  String covertArt;
-  String name;
-  List<Tune> songs;
-  PlayerState playbackState;
-  DateTime creationDate;
-  Playlist(this.name, this.songs, this.playbackState, this.covertArt){
-    this.id= uuid.v1();
-    this.creationDate=DateTime.now();
+  Uuid? uuid = new Uuid();
+  String? id;
+  String? covertArt;
+  String? name;
+  List<Tune>? songs;
+  PlayerState? playbackState;
+  DateTime? creationDate;
+  Playlist(this.name, this.songs, this.playbackState, this.covertArt) {
+    this.id = uuid!.v1();
+    this.creationDate = DateTime.now();
   }
 
   Playlist.fromMap(Map m) {
-
-    List<Tune> songlist=[];
-    (m["songs"] as List).forEach((songMap){
+    List<Tune> songlist = [];
+    (m["songs"] as List).forEach((songMap) {
       songlist.add(Tune.fromMap(songMap));
     });
 
-    id= m["id"];
+    id = m["id"];
     name = m["name"];
     songs = songlist;
-    playbackState= StringToPlayerState(m["playbackState"]);
-    covertArt= m["covertArt"];
-    creationDate= DateTime.parse(m["creationDate"]);
+    playbackState = StringToPlayerState(m["playbackState"]);
+    covertArt = m["covertArt"];
+    creationDate = DateTime.parse(m["creationDate"]);
   }
 
-  static Map toMap(Playlist playlist){
+  static Map toMap(Playlist playlist) {
     Map<String, dynamic> _map = {};
     //transforming the song list to a decodable format
-    List<Map> newSongsMap=[];
-    playlist.songs.forEach((song){
+    List<Map> newSongsMap = [];
+    playlist.songs!.forEach((song) {
       newSongsMap.add(song.toMap());
     });
 
     _map["name"] = playlist.name;
     _map["id"] = playlist.id;
     _map["songs"] = newSongsMap;
-    _map["playbackState"] = playlist.playbackState.index.toString();
+    _map["playbackState"] = playlist.playbackState!.index.toString();
     _map["covertArt"] = playlist.covertArt;
-    _map["creationDate"] = playlist.creationDate.toIso8601String();
+    _map["creationDate"] = playlist.creationDate!.toIso8601String();
     return _map;
   }
 
-  PlayerState StringToPlayerState(String string){
-    switch(string){
-      case "1":{
-        return PlayerState.playing;
-      }
-      case "2":{
-        return PlayerState.paused;
-      }
-      case "3":{
-        return PlayerState.stopped;
-      }
-      default:{
-        return PlayerState.stopped;
-      }
+  PlayerState StringToPlayerState(String string) {
+    switch (string) {
+      case "1":
+        {
+          return PlayerState.playing;
+        }
+      case "2":
+        {
+          return PlayerState.paused;
+        }
+      case "3":
+        {
+          return PlayerState.stopped;
+        }
+      default:
+        {
+          return PlayerState.stopped;
+        }
     }
   }
 }

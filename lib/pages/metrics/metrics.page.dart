@@ -13,48 +13,51 @@ import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
 class MetricsPage extends StatelessWidget {
-
-
   final metricService = locator<MusicMetricsService>();
   final musicService = locator<MusicService>();
-  ExpandableController  expandController = ExpandableController();
+  ExpandableController expandController = ExpandableController();
 
-  Widget getDataByMetric(MetricIds id, dynamic value){
-    switch(id){
-
-      case MetricIds.MET_GLOBAL_PLAY_TIME:{
-        Duration globalSongDuration = Duration(seconds: int.parse(value.toString()));
-        return GenericItem(
-          leading: Icon(
-            Icons.timer,
-            color: MyTheme.grey300,
-          ),
-          title: "Global time play",
-          subTitle: "${ConversionUtils.DurationToFancyText(globalSongDuration)}",
-        );
-      }
+  Widget? getDataByMetric(MetricIds id, dynamic value) {
+    switch (id) {
+      case MetricIds.MET_GLOBAL_PLAY_TIME:
+        {
+          Duration globalSongDuration =
+              Duration(seconds: int.parse(value.toString()));
+          return GenericItem(
+            leading: Icon(
+              Icons.timer,
+              color: MyTheme.grey300,
+            ),
+            title: "Global time play",
+            subTitle:
+                "${ConversionUtils.DurationToFancyText(globalSongDuration)}",
+          );
+        }
 
       case MetricIds.MET_GLOBAL_SONG_PLAY_TIME:
-        Map<String,dynamic> newValue = value;
-        var sortedKeys = newValue.keys.toList(growable:false)
-          ..sort((k1, k2) => int.parse(newValue[k2]).compareTo(int.parse(newValue[k1])));
-        Map<String,String> sortedMap = new Map
-            .fromIterable(sortedKeys, key: (k) => k, value: (k) => newValue[k]);
+        Map<String, dynamic> newValue = value;
+        var sortedKeys = newValue.keys.toList(growable: false)
+          ..sort((k1, k2) =>
+              int.parse(newValue[k2]).compareTo(int.parse(newValue[k1])));
+        Map<String, String> sortedMap = new Map.fromIterable(sortedKeys,
+            key: (k) => k, value: (k) => newValue[k]);
 
-        Map<Tune,int> finalMap = sortedMap.map((key, value) {
-          Tune newKey = musicService.songs$.value.firstWhere((element) => element.id==key, orElse: ()=>null);
-          return MapEntry(newKey, int.tryParse(value));
+        Map<Tune, int> finalMap = sortedMap.map((key, value) {
+          Tune newKey = musicService.songs$.value.firstWhere(
+              (element) => element.id == key,
+              orElse: () => throw Exception);
+          return MapEntry(newKey, int.tryParse(value)!);
         });
         List<Tune> finalMapSongs = finalMap.keys.toList();
-        finalMapSongs.removeWhere((element) => element==null);
-        ScrollController itemListController =ScrollController();
-        ExpandableController  expandController = ExpandableController();
+        finalMapSongs.removeWhere((element) => element == null);
+        ScrollController itemListController = ScrollController();
+        ExpandableController expandController = ExpandableController();
         bool previousState = false;
         expandController.addListener(() {
-          if(previousState && !expandController.expanded){
+          if (previousState && !expandController.expanded) {
             itemListController.jumpTo(0);
           }
-          previousState=expandController.expanded;
+          previousState = expandController.expanded;
         });
         return ExpandableNotifier(
           child: ScrollOnExpand(
@@ -77,8 +80,9 @@ class MetricsPage extends StatelessWidget {
                     Expanded(
                       child: ListView.builder(
                         controller: itemListController,
-                        itemBuilder: (context, index){
-                          Duration songDuration = Duration(seconds: finalMap[finalMapSongs[index]]);
+                        itemBuilder: (context, index) {
+                          Duration songDuration = Duration(
+                              seconds: finalMap[finalMapSongs[index]] as int);
                           return Material(
                               child: GestureDetector(
                                 child: Container(
@@ -89,26 +93,30 @@ class MetricsPage extends StatelessWidget {
                                         height: 40,
                                         width: 40,
                                         child: FadeInImage(
-                                          placeholder: AssetImage('images/track.png'),
-                                          fadeInDuration: Duration(milliseconds: 200),
-                                          fadeOutDuration: Duration(milliseconds: 100),
-                                          image: finalMapSongs[index].albumArt != null
+                                          placeholder:
+                                              AssetImage('images/track.png'),
+                                          fadeInDuration:
+                                              Duration(milliseconds: 200),
+                                          fadeOutDuration:
+                                              Duration(milliseconds: 100),
+                                          image: finalMapSongs[index]
+                                                      .albumArt !=
+                                                  null
                                               ? FileImage(
-                                            new File(finalMapSongs[index].albumArt),
-                                          )
-                                              : AssetImage('images/track.png'),
+                                                  new File(finalMapSongs[index]
+                                                      .albumArt as String),
+                                                )
+                                              : AssetImage('images/track.png')
+                                                  as ImageProvider<Object>,
                                         ),
                                       ),
                                       title: "${finalMapSongs[index].title}",
-                                      subTitle: "${ConversionUtils.DurationToFancyText(songDuration)}"
-                                  ),
+                                      subTitle:
+                                          "${ConversionUtils.DurationToFancyText(songDuration)}"),
                                 ),
-                                onTap: (){
-
-                                },
+                                onTap: () {},
                               ),
-                              color: Colors.transparent
-                          );
+                              color: Colors.transparent);
                         },
                         scrollDirection: Axis.vertical,
                         itemCount: finalMapSongs.length,
@@ -121,7 +129,7 @@ class MetricsPage extends StatelessWidget {
                     MyScrollbar(
                       controller: itemListController,
                       color: null,
-                      showFromTheStart:finalMap.length*62>200,
+                      showFromTheStart: finalMap.length * 62 > 200,
                     )
                   ],
                 ),
@@ -139,24 +147,27 @@ class MetricsPage extends StatelessWidget {
         );
         break;
       case MetricIds.MET_GLOBAL_ARTIST_PLAY_TIME:
-        Map<String,dynamic> newValue = value;
-        var sortedKeys = newValue.keys.toList(growable:false)
-          ..sort((k1, k2) => int.parse(newValue[k2]).compareTo(int.parse(newValue[k1])));
-        Map<String,String> sortedMap = new Map
-            .fromIterable(sortedKeys, key: (k) => k, value: (k) => newValue[k]);
-        Map<Artist,int> finalMap = sortedMap.map((key, value) {
-          Artist newKey = musicService.artists$.value.firstWhere((element) => element.id==int.parse(key), orElse: ()=>null);
-          return MapEntry(newKey, int.tryParse(value));
+        Map<String, dynamic> newValue = value;
+        var sortedKeys = newValue.keys.toList(growable: false)
+          ..sort((k1, k2) =>
+              int.parse(newValue[k2]).compareTo(int.parse(newValue[k1])));
+        Map<String, String> sortedMap = new Map.fromIterable(sortedKeys,
+            key: (k) => k, value: (k) => newValue[k]);
+        Map<Artist, int> finalMap = sortedMap.map((key, value) {
+          Artist newKey = musicService.artists$.value.firstWhere(
+              (element) => element.id == int.parse(key),
+              orElse: () => throw Exception);
+          return MapEntry(newKey, int.tryParse(value)!);
         });
         List<Artist> finalMapArtists = finalMap.keys.toList();
-        ScrollController itemListController =ScrollController();
-        ExpandableController  expandController = ExpandableController();
+        ScrollController itemListController = ScrollController();
+        ExpandableController expandController = ExpandableController();
         bool previousState = false;
         expandController.addListener(() {
-          if(previousState && !expandController.expanded){
+          if (previousState && !expandController.expanded) {
             itemListController.jumpTo(0);
           }
-          previousState=expandController.expanded;
+          previousState = expandController.expanded;
         });
         return ExpandableNotifier(
           child: ScrollOnExpand(
@@ -180,8 +191,10 @@ class MetricsPage extends StatelessWidget {
                       Expanded(
                         child: ListView.builder(
                           controller: itemListController,
-                          itemBuilder: (context, index){
-                            Duration songDuration = Duration(seconds: finalMap[finalMapArtists[index]]);
+                          itemBuilder: (context, index) {
+                            Duration songDuration = Duration(
+                                seconds:
+                                    finalMap[finalMapArtists[index]] as int);
                             return Material(
                                 child: GestureDetector(
                                   child: Container(
@@ -191,26 +204,31 @@ class MetricsPage extends StatelessWidget {
                                           height: 40,
                                           width: 40,
                                           child: FadeInImage(
-                                            placeholder: AssetImage('images/track.png'),
-                                            fadeInDuration: Duration(milliseconds: 200),
-                                            fadeOutDuration: Duration(milliseconds: 100),
-                                            image: finalMapArtists[index].coverArt != null
+                                            placeholder:
+                                                AssetImage('images/track.png'),
+                                            fadeInDuration:
+                                                Duration(milliseconds: 200),
+                                            fadeOutDuration:
+                                                Duration(milliseconds: 100),
+                                            image: finalMapArtists[index]
+                                                        .coverArt !=
+                                                    null
                                                 ? FileImage(
-                                              new File(finalMapArtists[index].coverArt),
-                                            )
-                                                : AssetImage('images/track.png'),
+                                                    new File(
+                                                        finalMapArtists[index]
+                                                            .coverArt!),
+                                                  )
+                                                : AssetImage('images/track.png')
+                                                    as ImageProvider<Object>,
                                           ),
                                         ),
                                         title: "${finalMapArtists[index].name}",
-                                        subTitle: "${ConversionUtils.DurationToFancyText(songDuration)}"
-                                    ),
+                                        subTitle:
+                                            "${ConversionUtils.DurationToFancyText(songDuration)}"),
                                   ),
-                                  onTap: (){
-
-                                  },
+                                  onTap: () {},
                                 ),
-                                color: Colors.transparent
-                            );
+                                color: Colors.transparent);
                           },
                           scrollDirection: Axis.vertical,
                           itemCount: finalMap.length,
@@ -223,7 +241,7 @@ class MetricsPage extends StatelessWidget {
                       MyScrollbar(
                         controller: itemListController,
                         color: null,
-                        showFromTheStart:finalMap.length*62>200,
+                        showFromTheStart: finalMap.length * 62 > 200,
                       )
                     ],
                   ),
@@ -234,15 +252,14 @@ class MetricsPage extends StatelessWidget {
                   tapHeaderToExpand: true,
                   iconSize: 35,
                   iconPadding: EdgeInsets.all(8),
-                )
-            ),
+                )),
           ),
           controller: expandController,
         );
         break;
       case MetricIds.MET_GLOBAL_LAST_PLAYED_SONGS:
         // TODO: Handle this case.
-      return Container();
+        return Container();
         break;
       case MetricIds.MET_GLOBAL_LAST_PLAYED_PLAYLIST:
         // TODO: Handle this case.
@@ -251,16 +268,15 @@ class MetricsPage extends StatelessWidget {
         // TODO: Handle this case.
         break;
     }
+    return null;
   }
-
 
   @override
   Widget build(BuildContext context) {
     ScrollController controller = ScrollController();
     return Container(
       color: MyTheme.darkBlack,
-      height: MediaQuery.of(context).size.height -160,
-
+      height: MediaQuery.of(context).size.height - 160,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -272,7 +288,8 @@ class MetricsPage extends StatelessWidget {
               controller: controller,
               slivers: <Widget>[
                 SliverToBoxAdapter(
-                  child: ItemListDevider(DeviderTitle: "Playing Metrics",
+                  child: ItemListDevider(
+                    DeviderTitle: "Playing Metrics",
                     backgroundColor: Colors.transparent,
                   ),
                 ),
@@ -286,54 +303,81 @@ class MetricsPage extends StatelessWidget {
                               child: Container(
                                   margin: EdgeInsets.only(right: 8),
                                   child: StreamBuilder(
-                                    stream: metricService.getOrCreateSingleSettingStream(MetricIds.MET_GLOBAL_PLAY_TIME),
-                                    builder: (context, AsyncSnapshot<dynamic> snapshot){
-                                      Widget widgetToBe = Container(child: GenericItem(title: "LOADING", subTitle: "",),);
-                                      if(snapshot.hasData){
-                                        widgetToBe = getDataByMetric(MetricIds.MET_GLOBAL_PLAY_TIME, snapshot.data);
+                                    stream: metricService
+                                        .getOrCreateSingleSettingStream(
+                                            MetricIds.MET_GLOBAL_PLAY_TIME),
+                                    builder: (context,
+                                        AsyncSnapshot<dynamic> snapshot) {
+                                      Widget widgetToBe = Container(
+                                        child: GenericItem(
+                                          title: "LOADING",
+                                          subTitle: "",
+                                        ),
+                                      );
+                                      if (snapshot.hasData) {
+                                        widgetToBe = getDataByMetric(
+                                            MetricIds.MET_GLOBAL_PLAY_TIME,
+                                            snapshot.data) as Widget;
                                       }
                                       return widgetToBe;
                                     },
-                                  )
-                              ),
-                              color: Colors.transparent
-                          ),
+                                  )),
+                              color: Colors.transparent),
                         ),
                         Flexible(
                           child: Material(
                               child: Container(
                                   margin: EdgeInsets.only(right: 8),
                                   child: StreamBuilder(
-                                    stream: metricService.getOrCreateSingleSettingStream(MetricIds.MET_GLOBAL_SONG_PLAY_TIME),
-                                    builder: (context, AsyncSnapshot<dynamic> snapshot){
-                                      Widget widgetToBe = Container(child: GenericItem(title: "LOADING", subTitle: "",),);
-                                      if(snapshot.hasData){
-                                        widgetToBe = getDataByMetric(MetricIds.MET_GLOBAL_SONG_PLAY_TIME, snapshot.data);
+                                    stream: metricService
+                                        .getOrCreateSingleSettingStream(
+                                            MetricIds
+                                                .MET_GLOBAL_SONG_PLAY_TIME),
+                                    builder: (context,
+                                        AsyncSnapshot<dynamic> snapshot) {
+                                      Widget widgetToBe = Container(
+                                        child: GenericItem(
+                                          title: "LOADING",
+                                          subTitle: "",
+                                        ),
+                                      );
+                                      if (snapshot.hasData) {
+                                        widgetToBe = getDataByMetric(
+                                            MetricIds.MET_GLOBAL_SONG_PLAY_TIME,
+                                            snapshot.data) as Widget;
                                       }
                                       return widgetToBe;
                                     },
-                                  )
-                              ),
-                              color: Colors.transparent
-                          ),
+                                  )),
+                              color: Colors.transparent),
                         ),
                         Flexible(
                           child: Material(
                               child: Container(
                                   margin: EdgeInsets.only(right: 8),
                                   child: StreamBuilder(
-                                    stream: metricService.getOrCreateSingleSettingStream(MetricIds.MET_GLOBAL_ARTIST_PLAY_TIME),
-                                    builder: (context, AsyncSnapshot<dynamic> snapshot){
-                                      Widget widgetToBe = Container(child: GenericItem(title: "LOADING", subTitle: "",),);
-                                      if(snapshot.hasData){
-                                        widgetToBe = getDataByMetric(MetricIds.MET_GLOBAL_ARTIST_PLAY_TIME, snapshot.data);
+                                    stream: metricService
+                                        .getOrCreateSingleSettingStream(
+                                            MetricIds
+                                                .MET_GLOBAL_ARTIST_PLAY_TIME),
+                                    builder: (context,
+                                        AsyncSnapshot<dynamic> snapshot) {
+                                      Widget widgetToBe = Container(
+                                        child: GenericItem(
+                                          title: "LOADING",
+                                          subTitle: "",
+                                        ),
+                                      );
+                                      if (snapshot.hasData) {
+                                        widgetToBe = getDataByMetric(
+                                            MetricIds
+                                                .MET_GLOBAL_ARTIST_PLAY_TIME,
+                                            snapshot.data) as Widget;
                                       }
                                       return widgetToBe;
                                     },
-                                  )
-                              ),
-                              color: Colors.transparent
-                          ),
+                                  )),
+                              color: Colors.transparent),
                         )
                       ],
                     ),
@@ -347,5 +391,4 @@ class MetricsPage extends StatelessWidget {
       ),
     );
   }
-
 }

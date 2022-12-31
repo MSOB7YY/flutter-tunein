@@ -17,8 +17,7 @@ import 'package:Tunein/services/sideDrawerService.dart';
 import 'package:Tunein/services/themeService.dart';
 import 'package:get_it/get_it.dart';
 
-
-GetIt locator = new GetIt();
+GetIt locator = GetIt.instance;
 
 void setupLocator() {
   locator.registerSingleton(MemoryCacheService());
@@ -40,5 +39,4 @@ void setupLocator() {
   locator.registerSingleton(httpRequests());
   locator.registerSingleton(Requests());
   locator.registerSingleton(UtilsRequests());
-
 }

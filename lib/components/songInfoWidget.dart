@@ -6,44 +6,45 @@ import 'package:Tunein/services/musicService.dart';
 import 'package:Tunein/utils/ConversionUtils.dart';
 import 'package:flutter/material.dart';
 
-
 class SongInfoWidget extends StatelessWidget {
   final musicService = locator<MusicService>();
-  final Map infoEntry;
-  Tune song;
-  SongInfoWidget(this.infoEntry,{this.song});
+  final Map? infoEntry;
+  Tune? song;
+  SongInfoWidget(this.infoEntry, {this.song});
 
   @override
   Widget build(BuildContext context) {
-    if(infoEntry==null){
+    if (infoEntry == null) {
       return StreamBuilder(
-        stream: musicService.getSongInformation(song).asStream(),
-        builder: (context, AsyncSnapshot<Map<dynamic,dynamic>> snapshot){
+        stream: musicService.getSongInformation(song!).asStream(),
+        builder: (context, AsyncSnapshot<Map<dynamic, dynamic>> snapshot) {
           return AnimatedSwitcher(
             duration: Duration(milliseconds: 300),
-            child: !snapshot.hasData?Container(
-              color: MyTheme.bgBottomBar,
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    CircularProgressIndicator(
-                      strokeWidth: 4,
-                      valueColor: AlwaysStoppedAnimation<Color>(MyTheme.darkRed),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      child: Text("Getting Info",
-                        style: TextStyle(
-                            color: MyTheme.grey300,
-                            fontSize: 18
-                        ),
+            child: !snapshot.hasData
+                ? Container(
+                    color: MyTheme.bgBottomBar,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          CircularProgressIndicator(
+                            strokeWidth: 4,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(MyTheme.darkRed),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 8),
+                            child: Text(
+                              "Getting Info",
+                              style: TextStyle(
+                                  color: MyTheme.grey300, fontSize: 18),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ):songInfoWidgeItemList(snapshot.data),
+                  )
+                : songInfoWidgeItemList(snapshot.data),
           );
         },
       );
@@ -52,9 +53,7 @@ class SongInfoWidget extends StatelessWidget {
     return songInfoWidgeItemList(infoEntry);
   }
 
-
-
-  Widget songInfoWidgeItemList(Map<String, dynamic> infoEntry){
+  Widget songInfoWidgeItemList(Map<dynamic, dynamic>? infoEntry) {
     return Material(
       color: Colors.transparent,
       elevation: 0,
@@ -76,12 +75,11 @@ class SongInfoWidget extends StatelessWidget {
                   Expanded(
                     flex: 10,
                     child: Text(
-                      infoEntry["title"]??"No Title",
+                      infoEntry!["title"] ?? "No Title",
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w300,
-                          color: MyTheme.grey300
-                      ),
+                          color: MyTheme.grey300),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
@@ -106,12 +104,11 @@ class SongInfoWidget extends StatelessWidget {
                   Expanded(
                     flex: 10,
                     child: Text(
-                      infoEntry["artist"]??"No Artist",
+                      infoEntry["artist"] ?? "No Artist",
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w300,
-                          color: MyTheme.grey300
-                      ),
+                          color: MyTheme.grey300),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
@@ -136,12 +133,14 @@ class SongInfoWidget extends StatelessWidget {
                   Expanded(
                     flex: 10,
                     child: Text(
-                      infoEntry["duration"]!=null?ConversionUtils.DurationToFancyText(infoEntry["duration"]):"No Duration",
+                      infoEntry["duration"] != null
+                          ? ConversionUtils.DurationToFancyText(
+                              infoEntry["duration"])
+                          : "No Duration",
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w300,
-                          color: MyTheme.grey300
-                      ),
+                          color: MyTheme.grey300),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
@@ -166,12 +165,11 @@ class SongInfoWidget extends StatelessWidget {
                   Expanded(
                     flex: 10,
                     child: Text(
-                      infoEntry["album"]??"No Album",
+                      infoEntry["album"] ?? "No Album",
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w300,
-                          color: MyTheme.grey300
-                      ),
+                          color: MyTheme.grey300),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
@@ -196,12 +194,11 @@ class SongInfoWidget extends StatelessWidget {
                   Expanded(
                     flex: 10,
                     child: Text(
-                      infoEntry["genre"]??"No genre",
+                      infoEntry["genre"] ?? "No genre",
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w300,
-                          color: MyTheme.grey300
-                      ),
+                          color: MyTheme.grey300),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
@@ -226,12 +223,11 @@ class SongInfoWidget extends StatelessWidget {
                   Expanded(
                     flex: 10,
                     child: Text(
-                      infoEntry["path"]??"No Path",
+                      infoEntry["path"] ?? "No Path",
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w300,
-                          color: MyTheme.grey300
-                      ),
+                          color: MyTheme.grey300),
                       maxLines: 5,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
@@ -255,26 +251,27 @@ class SongInfoWidget extends StatelessWidget {
                   ),
                   Expanded(
                     flex: 10,
-                    child: (infoEntry["playlist"]!=null && infoEntry["playlist"].length!=0)?
-                    Column(
-                        children: (infoEntry["playlist"] as List<Playlist>).map((e) {
-                          return SelectableTile.mediumWithSubtitle(
-                            imageUri: e.covertArt,
-                            title: "Playlist: ${e.name}",
-                            subtitle: "${e.songs.length} songs",
-                          );
-                        }).toList()
-                    ):Text(
-                      "Not part of a playlist",
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w300,
-                          color: MyTheme.grey300
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                    ),
+                    child: (infoEntry["playlist"] != null &&
+                            infoEntry["playlist"].length != 0)
+                        ? Column(
+                            children: (infoEntry["playlist"] as List<Playlist>)
+                                .map((e) {
+                            return SelectableTile.mediumWithSubtitle(
+                              imageUri: e.covertArt,
+                              title: "Playlist: ${e.name}",
+                              subtitle: "${e.songs!.length} songs",
+                            );
+                          }).toList())
+                        : Text(
+                            "Not part of a playlist",
+                            style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w300,
+                                color: MyTheme.grey300),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                          ),
                   )
                 ],
               ),

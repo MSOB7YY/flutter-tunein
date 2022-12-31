@@ -36,8 +36,8 @@ class MyUtils {
 
 
 class SlideRightRoute extends PageRouteBuilder {
-  final Widget page;
-  final Widget exitPage;
+  final Widget? page;
+  final Widget? exitPage;
   SlideRightRoute({this.page, this.exitPage})
       : super(
     pageBuilder: (
@@ -45,7 +45,7 @@ class SlideRightRoute extends PageRouteBuilder {
         Animation<double> animation,
         Animation<double> secondaryAnimation,
         ) =>
-    page,
+    page!,
     transitionsBuilder: (
         BuildContext context,
         Animation<double> animation,

@@ -1,19 +1,14 @@
-enum CachedItems{
-  SDCARD_NAME
-}
+enum CachedItems { SDCARD_NAME }
 
-class MemoryCacheService{
+class MemoryCacheService {
+  late Map<String, dynamic> primaryCache;
 
-
-  Map<String, dynamic> primaryCache;
-
-
-  MemoryCacheService(){
+  MemoryCacheService() {
     init();
   }
 
-  dynamic setCacheItem(dynamic id, dynamic value){
-    if(id is CachedItems){
+  dynamic setCacheItem(dynamic id, dynamic value) {
+    if (id is CachedItems) {
       primaryCache[id.toString()] = value;
       return;
     }
@@ -21,24 +16,21 @@ class MemoryCacheService{
     return;
   }
 
-  dynamic getCacheItem(dynamic id){
-    if(id is CachedItems){
+  dynamic getCacheItem(dynamic id) {
+    if (id is CachedItems) {
       return primaryCache[id.toString()];
     }
     return primaryCache[id];
   }
 
-  bool isItemCached(String id){
-    if(id is CachedItems){
+  bool isItemCached(String id) {
+    if (id is CachedItems) {
       return primaryCache.containsKey(id.toString());
     }
     return primaryCache.containsKey(id);
   }
 
-
-
-
-  init(){
-    primaryCache= new Map();
+  init() {
+    primaryCache = new Map();
   }
 }

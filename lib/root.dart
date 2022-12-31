@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'components/bottomnavbar.dart';
 import 'globals.dart';
+
 enum StartupState { Busy, Success, Error }
 
 class Root extends StatefulWidget {
@@ -42,19 +43,21 @@ class RootState extends State<Root> with TickerProviderStateMixin {
       StreamController<StartupState>();
   @override
   void initState() {
-    MusicServiceIsolate.callerCreateIsolate().then((value){
-      MusicServiceIsolate.sendReceive("Hello").then((retunedValue)async{
+    MusicServiceIsolate.callerCreateIsolate().then((value) {
+      MusicServiceIsolate.sendReceive("Hello").then((retunedValue) async {
         print("the returned value is ${retunedValue}");
         await SettingService.fetchSettings();
-        MusicServiceIsolate.callerCreatePluginEnabledIsolate({})
-            .then((value){
+        MusicServiceIsolate.callerCreatePluginEnabledIsolate({}).then((value) {
           print("isolate with plugins initiated");
           musicService.manualAudioPlayerInit();
           musicService.showUI();
-          MessagingUtils.sendNewStandardIsolateCommand(command: "createServerAndAddFilesHosting",
+          MessagingUtils.sendNewStandardIsolateCommand(
+              command: "createServerAndAddFilesHosting",
               message: [
-                SettingService.getCurrentMemorySetting(SettingsIds.SET_OUT_GOING_HTTP_SERVER_IP),
-                SettingService.getCurrentMemorySetting(SettingsIds.SET_OUT_GOING_HTTP_SERVER_PORT)
+                SettingService.getCurrentMemorySetting(
+                    SettingsIds.SET_OUT_GOING_HTTP_SERVER_IP),
+                SettingService.getCurrentMemorySetting(
+                    SettingsIds.SET_OUT_GOING_HTTP_SERVER_PORT)
               ]);
           loadFiles();
         });
@@ -76,90 +79,131 @@ class RootState extends State<Root> with TickerProviderStateMixin {
     //fetching all userMetrics doesn't need to be awaited
     metricService.fetchAllMetrics();
 
-    MessagingUtils.sendNewIsolateCommand(command: "LoadStarterFiles").then((value){
-      List<Tune> newSongs = (value["songs"] as List<Map>).map((e) =>Tune.fromMap(e)).toList();
-      List<Album> newAlbums =(value["albums"] as List<Map>).map((e) => Album.fromMap(e)).toList();
-      List<Artist> newArtists = (value["artists"] as List<Map>).map((e) => Artist.fromMap(e)).toList();
-      List<Playlist> newPlaylists = (value["playlists"] as List<Map>).map((e) => Playlist.fromMap(e)).toList();
-      List<Tune> newFavs = (value["favs"] as List<Map>).map((e) => Tune.fromMap(e)).toList();
-      bool newStartup = value["notNewStartup"]==null;
+    MessagingUtils.sendNewIsolateCommand(command: "LoadStarterFiles")
+        .then((value) {
+      List<Tune> newSongs =
+          (value["songs"] as List<Map>).map((e) => Tune.fromMap(e)).toList();
+      List<Album> newAlbums =
+          (value["albums"] as List<Map>).map((e) => Album.fromMap(e)).toList();
+      List<Artist> newArtists = (value["artists"] as List<Map>)
+          .map((e) => Artist.fromMap(e))
+          .toList();
+      List<Playlist> newPlaylists = (value["playlists"] as List<Map>)
+          .map((e) => Playlist.fromMap(e))
+          .toList();
+      List<Tune> newFavs =
+          (value["favs"] as List<Map>).map((e) => Tune.fromMap(e)).toList();
+      bool newStartup = value["notNewStartup"] == null;
       musicService.songs$.add(newSongs);
       musicService.albums$.add(newAlbums);
       musicService.artists$.add(newArtists);
       musicService.playlists$.add(newPlaylists);
       musicService.favorites$.add(newFavs);
-      if(newStartup){
+      if (newStartup) {
         loadLastTimeSongsAndPlaylists();
       }
       _startupStatus.add(StartupState.Success);
     });
   }
 
-  loadLastTimeSongsAndPlaylists(){
+  loadLastTimeSongsAndPlaylists() {
     //This will set the last song that was played as currently playing after an app reboot
-    StreamSubscription metricsLoaded;
-    metricsLoaded = metricService.metrics.listen((data) async{
-      if(data!=null){
-        List<Tune> lastPlayedSongs = data[MetricIds.MET_GLOBAL_LAST_PLAYED_SONGS];
-        Playlist lastPlayedPlaylist = data[MetricIds.MET_GLOBAL_LAST_PLAYED_PLAYLIST];
+    late StreamSubscription metricsLoaded;
+    metricsLoaded = metricService.metrics.listen((data) async {
+      if (data != null) {
+        List<Tune> lastPlayedSongs =
+            data[MetricIds.MET_GLOBAL_LAST_PLAYED_SONGS];
+        Playlist? lastPlayedPlaylist =
+            data[MetricIds.MET_GLOBAL_LAST_PLAYED_PLAYLIST];
 
         //Playlist update first
-        if(lastPlayedPlaylist!=null){
-          musicService.updatePlaylist(lastPlayedPlaylist.songs);
-        }else{
-          if(lastPlayedSongs.length!=0){
+        if (lastPlayedPlaylist != null) {
+          musicService.updatePlaylist(lastPlayedPlaylist.songs!);
+        } else {
+          if (lastPlayedSongs.isNotEmpty) {
             musicService.updatePlaylist(musicService.songs$.value);
           }
         }
 
-        if(lastPlayedSongs.length!=0){
+        if (lastPlayedSongs.isNotEmpty) {
           //A problem occurred here that the lastPlayedSongs[lastPlayedSongs.length-1] which is the last played song
           //doesn't ave the same reference as the same song in the songs lists that is generated when the app boots
           //and that is causing problems with songs.indexOF(song), it has been fixed elsewhere. This might be a further issue.
-          musicService.updatePlayerState(PlayerState.paused, lastPlayedSongs[lastPlayedSongs.length-1]);
+          musicService.updatePlayerState(
+              PlayerState.paused, lastPlayedSongs[lastPlayedSongs.length - 1]);
         }
 
-        if(lastPlayedPlaylist!=null){
-          musicService.updatePlaylistState(PlayerState.paused, lastPlayedPlaylist);
+        if (lastPlayedPlaylist != null) {
+          musicService.updatePlaylistState(
+              PlayerState.paused, lastPlayedPlaylist);
         }
 
-        if(lastPlayedSongs.length!=0){
+        if (lastPlayedSongs.isNotEmpty) {
           //setting the position to Zero
           musicService.updatePosition(Duration(milliseconds: 0));
           ByteData dibd = await rootBundle.load("images/cover.png");
           List<int> defaultImageBytes = dibd.buffer.asUint8List();
-          ByteData artistBundleImage = await rootBundle.load("images/artist.jpg");
-          List<int> defaultBgImageBytes = artistBundleImage.buffer.asUint8List();
-          Tune songToshowONNotification = musicService.playerState$.value.value;
-          if(SettingsService.getOrCreateSingleSettingStream(SettingsIds.SET_CUSTOM_NOTIFICATION_PLAYBACK_CONTROL).value=="true"){
-            Artist artist = musicService.artistsImages$.value!=null?musicService.artistsImages$.value[songToshowONNotification.artist]:null;
+          ByteData artistBundleImage =
+              await rootBundle.load("images/artist.jpg");
+          List<int> defaultBgImageBytes =
+              artistBundleImage.buffer.asUint8List();
+          Tune? songToshowONNotification = musicService.playerState$.value.value;
+          if (SettingsService.getOrCreateSingleSettingStream(
+                      SettingsIds.SET_CUSTOM_NOTIFICATION_PLAYBACK_CONTROL)
+                  .value ==
+              "true") {
+            Artist? artist = musicService.artistsImages$.value != null
+                ? musicService
+                    .artistsImages$.value[songToshowONNotification?.artist]
+                : null;
             NotificationService.show(
-                title: '${songToshowONNotification.title?? "Unknown Title"}',
-                author: '${songToshowONNotification.artist?? "Unknown Artist"}',
+                title: '${songToshowONNotification?.title ?? "Unknown Title"}',
+                author:
+                    '${songToshowONNotification?.artist ?? "Unknown Artist"}',
                 play: false,
-                image: songToshowONNotification.albumArt,
-                BitmapImage:
-                songToshowONNotification.albumArt == null ? defaultImageBytes : null,
-                titleColor: songToshowONNotification.colors.length!=0?Color(songToshowONNotification.colors[1]): MyTheme.grey300,
-                subtitleColor: songToshowONNotification.colors.length!=0?Color(songToshowONNotification.colors[1]).withAlpha(50): MyTheme.grey300,
-                iconColor: songToshowONNotification.colors.length!=0?Color(songToshowONNotification.colors[1]): MyTheme.grey300,
-                bigLayoutIconColor: artist.colors!=null && artist.colors.length!=0?Color(artist.colors[1]):null,
-                bgImage: songToshowONNotification.artist!=null?artist.coverArt:null,
-                bgBitmapImage: artist.coverArt==null? defaultBgImageBytes:null,
-                bgImageBackgroundColor: (artist.colors!=null && artist.colors.length!=0)?Color(artist.colors[0]):MyTheme.darkBlack,
-                bgColor: songToshowONNotification.colors.length!=0?Color(songToshowONNotification.colors[0]): MyTheme.grey300
-            );
+                image: songToshowONNotification?.albumArt,
+                BitmapImage: songToshowONNotification?.albumArt == null
+                    ? defaultImageBytes
+                    : null,
+                titleColor: songToshowONNotification?.colors!.isNotEmpty ?? false
+                    ? Color(songToshowONNotification!.colors![1]!)
+                    : MyTheme.grey300,
+                subtitleColor: songToshowONNotification?.colors!.isNotEmpty ?? false
+                    ? Color(songToshowONNotification!.colors![1]!).withAlpha(50)
+                    : MyTheme.grey300,
+                iconColor: songToshowONNotification?.colors!.isNotEmpty ?? false
+                    ? Color(songToshowONNotification!.colors![1]!)
+                    : MyTheme.grey300,
+                bigLayoutIconColor:
+                    artist!.colors != null && artist.colors.isNotEmpty
+                        ? Color(artist.colors[1]!)
+                        : null,
+                bgImage: songToshowONNotification?.artist != null
+                    ? artist.coverArt
+                    : null,
+                bgBitmapImage:
+                    artist.coverArt == null ? defaultBgImageBytes : null,
+                bgImageBackgroundColor:
+                    (artist.colors != null && artist.colors.isNotEmpty)
+                        ? Color(artist.colors[0]!)
+                        : MyTheme.darkBlack,
+                bgColor: songToshowONNotification?.colors?.isNotEmpty ?? false
+                    ? Color(songToshowONNotification!.colors![0]!)
+                    : MyTheme.grey300);
           }
 
-          if(SettingsService.getOrCreateSingleSettingStream(SettingsIds.SET_ANDROID_NOTIFICATION_PLAYBACK_CONTROL).value=="true"){
-
-            musicService.setAndroidNativeNotificationItem(
-              title: songToshowONNotification.title,
-              albumArt: songToshowONNotification.albumArt,
-              album: songToshowONNotification.album,
-              artist: songToshowONNotification.artist,
-              uri: songToshowONNotification.uri
-            ).then((itemSet){
+          if (SettingsService.getOrCreateSingleSettingStream(
+                      SettingsIds.SET_ANDROID_NOTIFICATION_PLAYBACK_CONTROL)
+                  .value ==
+              "true") {
+            musicService
+                .setAndroidNativeNotificationItem(
+                    title: songToshowONNotification?.title!,
+                    albumArt: songToshowONNotification?.albumArt!,
+                    album: songToshowONNotification?.album!,
+                    artist: songToshowONNotification?.artist!,
+                    uri: songToshowONNotification?.uri!)
+                .then((itemSet) {
               musicService.showAndroidNativeNotifications();
             });
           }
@@ -169,9 +213,9 @@ class RootState extends State<Root> with TickerProviderStateMixin {
     });
   }
 
-  Widget getDrawer(){
+  Widget getDrawer() {
     return SideDrawerComponent(
-      layoutService.sideDrawerKey,
+        layoutService.sideDrawerKey,
         Scaffold(
           key: layoutService.scaffoldKey,
           bottomNavigationBar: BottomNavBar(),
@@ -193,15 +237,12 @@ class RootState extends State<Root> with TickerProviderStateMixin {
                         CircularProgressIndicator(
                           strokeWidth: 5.0,
                         ),
-                        Text(
-                            "Scanning Your Library ...",
+                        Text("Scanning Your Library ...",
                             style: TextStyle(
                                 color: MyTheme.darkRed,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 16.0,
-                                height: 2.0
-                            )
-                        )
+                                height: 2.0))
                       ],
                     ),
                   ),
@@ -223,10 +264,11 @@ class RootState extends State<Root> with TickerProviderStateMixin {
                                 Expanded(
                                   child: CustomPageView(
                                     controller:
-                                    layoutService.globalPageController,
+                                        layoutService.globalPageController,
                                     physics: NeverScrollableScrollPhysics(),
                                     //scrollDirection: Axis.horizontal,
-                                    shallowWidget: Container(color: MyTheme.bgBottomBar),
+                                    shallowWidget:
+                                        Container(color: MyTheme.bgBottomBar),
                                     pages: [
                                       LibraryPage(),
                                       CollectionPage(),
@@ -268,8 +310,7 @@ class RootState extends State<Root> with TickerProviderStateMixin {
               );
             },
           ),
-        )
-    );
+        ));
   }
 
   @override
@@ -277,29 +318,39 @@ class RootState extends State<Root> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () {
         ///If the playing panel is open, go back to the player page and then close it first
-        if (!layoutService.globalPanelController.isPanelClosed()) {
-          if(layoutService.albumPlayerPageController.page!=1){
+        if (!layoutService.globalPanelController.isPanelClosed) {
+          if (layoutService.albumPlayerPageController.page != 1) {
             layoutService.albumPlayerPageController.jumpToPage(1);
-          }else{
+          } else {
             layoutService.globalPanelController.close();
           }
         } else {
           ///If the panel is not open
           ///IF you are in the ALbums Page and you have opened the single page page
-          if(layoutService.pageServices[0].pageViewController.hasClients && layoutService.albumListPageController.hasClients && layoutService.pageServices[0].pageViewController.page==2.0 && layoutService.albumListPageController.page>0.0){
-            layoutService.albumListPageController.previousPage(duration: Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
-          }else{
+          if (layoutService.pageServices[0].pageViewController.hasClients &&
+              layoutService.albumListPageController.hasClients &&
+              layoutService.pageServices[0].pageViewController.page == 2.0 &&
+              layoutService.albumListPageController.page! > 0.0) {
+            layoutService.albumListPageController.previousPage(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.fastOutSlowIn);
+          } else {
             ///If you are not in the albumPage and did not open the single album page
-            if(layoutService.pageServices[0].pageViewController.hasClients && layoutService.pageServices[0].pageViewController.page!=0.0){
+            if (layoutService.pageServices[0].pageViewController.hasClients &&
+                layoutService.pageServices[0].pageViewController.page != 0.0) {
               ///IF you are somewhere in the other pages like artist, or album  always go back to tracks
-              layoutService.pageServices[0].pageViewController.animateToPage(0, duration: Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
-            }else{
+              layoutService.pageServices[0].pageViewController.animateToPage(0,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.fastOutSlowIn);
+            } else {
               ///OtehrWise just put the app to backgRound
               _androidAppRetain.invokeMethod("sendToBackground");
               return Future.value(false);
             }
           }
         }
+
+        throw Exception;
       },
       child: getDrawer(),
     );

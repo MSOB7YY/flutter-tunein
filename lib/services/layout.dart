@@ -6,37 +6,35 @@ import 'package:Tunein/services/pageService.dart';
 
 class LayoutService {
   // Main PageView
-  PageController _globalPageController;
+  late PageController _globalPageController;
   PageController get globalPageController => _globalPageController;
 
   // Sub PageViews
-  List<PageService> _pageServices;
+  late List<PageService> _pageServices;
   List<PageService> get pageServices => _pageServices;
 
   // Main Panel
-  PanelController _globalPanelController;
+  late PanelController _globalPanelController;
   PanelController get globalPanelController => _globalPanelController;
-  PageController _albumPlayerPageController;
+  late PageController _albumPlayerPageController;
   PageController get albumPlayerPageController => _albumPlayerPageController;
-  PageController _albumListPageController;
+  late PageController _albumListPageController;
   PageController get albumListPageController => _albumListPageController;
-  VoidCallback _onPanelOpenCallback;
+  late VoidCallback _onPanelOpenCallback;
   VoidCallback get onPanelOpenCallback => _onPanelOpenCallback;
-
 
   set onPanelOpenCallback(VoidCallback value) {
     _onPanelOpenCallback = value;
-
-
   } // global keys
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
 
-  final GlobalKey<InnerDrawerState> _sideDrawerKey = GlobalKey<InnerDrawerState>();
+  final GlobalKey<InnerDrawerState> _sideDrawerKey =
+      GlobalKey<InnerDrawerState>();
 
   GlobalKey<InnerDrawerState> get sideDrawerKey => _sideDrawerKey;
-
 
   LayoutService() {
     _initGlobalPageView();
@@ -47,9 +45,11 @@ class LayoutService {
   }
 
   void _initSubPageViews() {
-    _pageServices = List<PageService>(4);
+    // _pageServices = List<PageService>(4);
+    _pageServices = List<PageService>.filled(4, PageService(0));
     for (var i = 0; i < _pageServices.length; i++) {
-      _pageServices[i] = PageService(i, Controller: i==0?PageController(keepPage: true):null);
+      _pageServices[i] = PageService(i,
+          Controller: i == 0 ? PageController(keepPage: true) : null);
     }
   }
 
@@ -62,10 +62,7 @@ class LayoutService {
   }
 
   void _initPlayingPageView() {
-    _albumPlayerPageController = PageController(
-      initialPage: 1,
-      keepPage: true
-    );
+    _albumPlayerPageController = PageController(initialPage: 1, keepPage: true);
   }
 
   void _initAlbumListPageView() {
@@ -83,8 +80,8 @@ class LayoutService {
 
   //mainpanel functions
 
-  onPanelOpen(dynamic data){
-    if(onPanelOpenCallback!=null){
+  onPanelOpen(dynamic data) {
+    if (onPanelOpenCallback != null) {
       onPanelOpenCallback();
     }
   }

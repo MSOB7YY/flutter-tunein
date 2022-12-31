@@ -2,29 +2,29 @@ import 'package:Tunein/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 class AnimatedDialog extends StatefulWidget {
-
-
-  Widget dialogContent;
-  Widget traversingWidget;
-  GlobalKey traversingWidgetGlobalKey;
-  double maxHeight;
-  double maxWidth;
-  Animation<double> inputAnimation;
-  AnimatedDialog({this.dialogContent, this.traversingWidget, this.maxHeight, this.maxWidth, this.inputAnimation});
-
-
+  Widget? dialogContent;
+  Widget? traversingWidget;
+  GlobalKey? traversingWidgetGlobalKey;
+  double? maxHeight;
+  double? maxWidth;
+  Animation<double>? inputAnimation;
+  AnimatedDialog(
+      {this.dialogContent,
+      this.traversingWidget,
+      this.maxHeight,
+      this.maxWidth,
+      this.inputAnimation});
 
   @override
   _AnimatedDialogState createState() => _AnimatedDialogState();
 }
 
-class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProviderStateMixin{
+class _AnimatedDialogState extends State<AnimatedDialog>
+    with SingleTickerProviderStateMixin {
   /// The [AnimationController] is a Flutter Animation object that generates a new value
   /// whenever the hardware is ready to draw a new frame.
-  AnimationController _controller;
-
+  AnimationController? _controller;
 
   ///DEPRECATED
   ///NO INTERNAL TWEEN IS BEING USED HERE, phased for generalDialog transitionBuilder
@@ -36,8 +36,7 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
   );
 
   /// The [Animation] object itself, which is required by the [SizeTransition] widget in the [build()] method.
-  Animation<double> _sizeAnimation;
-
+  Animation<double>? _sizeAnimation;
 
   /// Detects which state the widget is currently in, and triggers the animation upon change.
   bool _isExpanded = false;
@@ -45,7 +44,7 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
   /// Here we initialize the fields described above, and set up the widget to its initial state.
   @override
   initState() {
-    _sizeAnimation = widget.inputAnimation??_sizeAnimation;
+    _sizeAnimation = widget.inputAnimation ?? _sizeAnimation;
     super.initState();
 
     _controller = AnimationController(
@@ -55,10 +54,10 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
 
     /// This curve is controlled by [_controller].
     final CurvedAnimation curve =
-    CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn);
+        CurvedAnimation(parent: _controller!, curve: Curves.fastOutSlowIn);
 
     /// [_sizeAnimation] will interpolate using this curve - [Curves.fastOutSlowIn].
-   /* _sizeAnimation = _sizeTween.animate(curve);
+    /* _sizeAnimation = _sizeTween.animate(curve);
     _controller.addListener(() {
       setState(() {});
     });*/
@@ -70,7 +69,7 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
   void didUpdateWidget(AnimatedDialog oldWidget) {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
-    _sizeAnimation=oldWidget.inputAnimation;
+    _sizeAnimation = oldWidget.inputAnimation;
   }
 
   @override
@@ -78,7 +77,7 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
     ///DEPRECATED
     ///NO INTERNAL TWEEN IS BEING USED HERE, phased for generalDialog transitionBuilder
     //_controller.reverse();
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -89,12 +88,12 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
       _isExpanded = !_isExpanded;
     });
     print("isExpandable? ${_isExpanded}");
-    switch (_sizeAnimation.status) {
+    switch (_sizeAnimation!.status) {
       case AnimationStatus.completed:
-        _controller.reverse();
+        _controller!.reverse();
         break;
       case AnimationStatus.dismissed:
-        _controller.forward();
+        _controller!.forward();
         break;
       case AnimationStatus.reverse:
       case AnimationStatus.forward:
@@ -105,10 +104,12 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return ScaleTransition(
-      scale: _sizeAnimation,
-      child: widget.dialogContent??Container(height: 100, width: 100, color: MyTheme.darkRed,)
-    );
+        scale: _sizeAnimation!,
+        child: widget.dialogContent ??
+            Container(
+              height: 100,
+              width: 100,
+              color: MyTheme.darkRed,
+            ));
   }
-
-
 }

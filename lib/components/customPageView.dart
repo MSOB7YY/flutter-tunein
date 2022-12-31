@@ -1,20 +1,18 @@
 import 'package:Tunein/components/common/ShowWithFadeComponent.dart';
 import 'package:flutter/material.dart';
 
-
 class CustomPageView extends StatefulWidget {
-
-
   List<Widget> pages;
-  PageController controller;
+  PageController? controller;
   bool preload;
-  Widget shallowWidget;
-  ScrollPhysics physics;
-  CustomPageView({Key key, pages, controller, shallowWidget, physics, preload}) : this.pages = pages ?? [],
+  Widget? shallowWidget;
+  ScrollPhysics? physics;
+  CustomPageView({Key? key, pages, controller, shallowWidget, physics, preload})
+      : this.pages = pages ?? [],
         this.controller = controller ?? new PageController(keepPage: true),
-        this.shallowWidget=shallowWidget,
-        this.physics=physics,
-        this.preload=preload??true,
+        this.shallowWidget = shallowWidget,
+        this.physics = physics,
+        this.preload = preload ?? true,
         super(key: key);
 
   @override
@@ -22,18 +20,17 @@ class CustomPageView extends StatefulWidget {
 }
 
 class _CustomPageViewState extends State<CustomPageView> {
-
   List savedPages = [];
-
 
   @override
   void initState() {
     super.initState();
-    savedPages = widget.pages.map((elem)=> ShowWithFade(
-        child: elem,
-        shallowWidget: widget.shallowWidget??Container(color: Colors.red),
-        durationUntilFadeStarts: durationUntilPageShow)
-    ).toList();
+    savedPages = widget.pages
+        .map((elem) => ShowWithFade(
+            child: elem,
+            shallowWidget: widget.shallowWidget ?? Container(color: Colors.red),
+            durationUntilFadeStarts: durationUntilPageShow))
+        .toList();
   }
 
   Duration durationUntilPageShow = Duration(milliseconds: 200);
@@ -42,8 +39,7 @@ class _CustomPageViewState extends State<CustomPageView> {
     return PageView(
       controller: widget.controller,
       physics: widget.physics,
-      children:  savedPages,
+      children: savedPages as List<Widget>,
     );
   }
-
 }

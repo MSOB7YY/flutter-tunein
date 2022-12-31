@@ -14,14 +14,15 @@ import 'package:Tunein/values/contextMenus.dart';
 import 'package:badges/badges.dart';
 import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_reorderable_list/flutter_reorderable_list.dart';
+
+// import 'package:intl/intl.dart';
+import 'package:flutter_reorderable_list/flutter_reorderable_list.dart' as item;
 import 'package:Tunein/services/musicService.dart';
 import 'package:Tunein/services/themeService.dart';
 import 'package:rxdart/rxdart.dart';
 
 class EditPlaylist extends StatefulWidget {
-  Playlist playlist;
+  Playlist? playlist;
 
   EditPlaylist({this.playlist});
 
@@ -33,16 +34,16 @@ class _EditPlaylistState extends State<EditPlaylist> {
   final musicService = locator<MusicService>();
   final themeService = locator<ThemeService>();
 
-  List<String> removedSongsIds = [];
-  List<Tune> songsToBeRemoved = [];
-  ScrollController controller = new ScrollController();
-  BehaviorSubject<Playlist> playlistInEditing = new BehaviorSubject<Playlist>();
+  List<String>? removedSongsIds = [];
+  List<Tune>? songsToBeRemoved = [];
+  ScrollController? controller = new ScrollController();
+  BehaviorSubject<Playlist>? playlistInEditing = new BehaviorSubject<Playlist>();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    this.playlistInEditing.add(widget.playlist);
+    this.playlistInEditing!.add(widget.playlist!);
   }
 
   @override
@@ -56,6 +57,7 @@ class _EditPlaylistState extends State<EditPlaylist> {
     return WillPopScope(
       onWillPop: () {
         OnPopWithUnsavedContent();
+        throw Exception;
       },
       child: Material(
         color: Colors.transparent,
@@ -83,16 +85,15 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                           child: Image.asset('images/track.png'),
                                         ),
                                         onTap: () async {
-                                          File imageFile = await DialogService.openImagePickingDialog(
-                                              context, musicService.albums$.value);
+                                          File imageFile = await DialogService.openImagePickingDialog(context, musicService.albums$.value);
                                           if (imageFile != null) {
-                                            Playlist newPlaylist = this.playlistInEditing.value;
+                                            Playlist newPlaylist = this.playlistInEditing!.value;
                                             newPlaylist.covertArt = imageFile.uri.toFilePath();
-                                            this.playlistInEditing.add(newPlaylist);
+                                            this.playlistInEditing!.add(newPlaylist);
                                           }
                                         },
                                       )
-                                    : (newAlbumArt == this.widget.playlist.covertArt)
+                                    : (newAlbumArt == this.widget.playlist!.covertArt)
                                         ? GestureDetector(
                                             child: Container(
                                               height: 60,
@@ -101,20 +102,19 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                                 placeholder: AssetImage('images/track.png'),
                                                 fadeInDuration: Duration(milliseconds: 200),
                                                 fadeOutDuration: Duration(milliseconds: 100),
-                                                image: this.widget.playlist.covertArt != null
+                                                image: this.widget.playlist!.covertArt != null
                                                     ? FileImage(
-                                                        new File(this.widget.playlist.covertArt),
+                                                        new File(this.widget.playlist!.covertArt!),
                                                       )
-                                                    : AssetImage('images/track.png'),
+                                                    : AssetImage('images/track.png') as ImageProvider<Object>,
                                               ),
                                             ),
                                             onTap: () async {
-                                              File imageFile = await DialogService.openImagePickingDialog(
-                                                  context, musicService.albums$.value);
+                                              File imageFile = await DialogService.openImagePickingDialog(context, musicService.albums$.value);
                                               if (imageFile != null) {
-                                                Playlist newPlaylist = this.playlistInEditing.value;
+                                                Playlist newPlaylist = this.playlistInEditing!.value;
                                                 newPlaylist.covertArt = imageFile.uri.toFilePath();
-                                                this.playlistInEditing.add(newPlaylist);
+                                                this.playlistInEditing!.add(newPlaylist);
                                               }
                                             },
                                           )
@@ -131,16 +131,15 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                                       ? FileImage(
                                                           new File(newAlbumArt),
                                                         )
-                                                      : AssetImage('images/track.png'),
+                                                      : AssetImage('images/track.png') as ImageProvider<Object>,
                                                 ),
                                               ),
                                               onTap: () async {
-                                                File imageFile = await DialogService.openImagePickingDialog(
-                                                    context, musicService.albums$.value);
+                                                File imageFile = await DialogService.openImagePickingDialog(context, musicService.albums$.value);
                                                 if (imageFile != null) {
-                                                  Playlist newPlaylist = this.playlistInEditing.value;
+                                                  Playlist newPlaylist = this.playlistInEditing!.value;
                                                   newPlaylist.covertArt = imageFile.uri.toFilePath();
-                                                  this.playlistInEditing.add(newPlaylist);
+                                                  this.playlistInEditing!.add(newPlaylist);
                                                 }
                                               },
                                             ),
@@ -163,9 +162,9 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                                     size: 15,
                                                   ),
                                                   onTap: () {
-                                                    Playlist newPlaylist = this.playlistInEditing.value;
-                                                    newPlaylist.covertArt = this.widget.playlist.covertArt;
-                                                    this.playlistInEditing.add(newPlaylist);
+                                                    Playlist newPlaylist = this.playlistInEditing!.value;
+                                                    newPlaylist.covertArt = this.widget.playlist!.covertArt;
+                                                    this.playlistInEditing!.add(newPlaylist);
                                                   },
                                                 ),
                                               ),
@@ -189,9 +188,7 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                                 Padding(
                                                   padding: const EdgeInsets.only(bottom: 8),
                                                   child: Text(
-                                                    (playlist.name == null || playlist.name.length == 0)
-                                                        ? "Unnamed Playlist"
-                                                        : playlist.name,
+                                                    (playlist.name == null || playlist.name!.length == 0) ? "Unnamed Playlist" : playlist.name as String,
                                                     overflow: TextOverflow.ellipsis,
                                                     maxLines: 2,
                                                     style: TextStyle(
@@ -211,11 +208,11 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                               ],
                                             ),
                                             onTap: () {
-                                              this.openNameChangeModal(playlist).then((newName) {
+                                              this.openNameChangeModal(playlist)!.then((newName) {
                                                 if (newName != null) {
-                                                  Playlist newPlaylist = this.playlistInEditing.value;
+                                                  Playlist newPlaylist = this.playlistInEditing!.value;
                                                   newPlaylist.name = newName;
-                                                  this.playlistInEditing.add(newPlaylist);
+                                                  this.playlistInEditing!.add(newPlaylist);
                                                 }
                                               });
                                             },
@@ -224,7 +221,7 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-                                              songsToBeRemoved.length != 0
+                                              songsToBeRemoved!.length != 0
                                                   ? IconButton(
                                                       onPressed: () {
                                                         clearAllChanges();
@@ -258,9 +255,9 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                       ),
                                       Text(
-                                        (widget.playlist.songs.length == 0)
+                                        (widget.playlist!.songs!.length == 0)
                                             ? "No Songs"
-                                            : "${widget.playlist.songs.length} song(s) ${removedSongsIds.length != 0 ? "(-${removedSongsIds.length})" : ""}",
+                                            : "${widget.playlist!.songs!.length} song(s) ${removedSongsIds!.length != 0 ? "(-${removedSongsIds!.length})" : ""}",
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 15.5,
@@ -286,7 +283,11 @@ class _EditPlaylistState extends State<EditPlaylist> {
                 elevation: 5.0,
               ),
               Flexible(
-                child: ReorderableList(
+                child: item.ReorderableList(
+                  onReorder: (draggedItem, newPosition) {
+                    setState(() {});
+                    throw Exception;
+                  },
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
@@ -300,22 +301,22 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                 shrinkWrap: true,
                                 itemExtent: 62,
                                 physics: AlwaysScrollableScrollPhysics(),
-                                itemCount: widget.playlist.songs.length,
+                                itemCount: widget.playlist!.songs!.length,
                                 itemBuilder: (context, index) {
-                                  if (!removedSongsIds.contains(widget.playlist.songs[index].id)) {
-                                    return DelayedReorderableListener(
-                                      child: ReorderableItem(
-                                        key: Key(widget.playlist.songs[index].id),
+                                  if (!removedSongsIds!.contains(widget.playlist!.songs![index].id)) {
+                                    return item.DelayedReorderableListener(
+                                      child: item.ReorderableItem(
+                                        key: Key(widget.playlist!.songs![index].id!),
                                         childBuilder: (context, state) {
                                           return MyCard(
-                                            song: widget.playlist.songs[index],
+                                            song: widget.playlist!.songs![index],
                                             choices: editPlaylistSongCardContextMenulist,
                                             ScreenSize: screenSize,
                                             onContextSelect: (choice) {
                                               switch (choice.id) {
                                                 case 1:
                                                   {
-                                                    deleteSongFromPlaylist(widget.playlist.songs[index]);
+                                                    deleteSongFromPlaylist(widget.playlist!.songs![index]);
                                                   }
                                               }
                                             },
@@ -329,25 +330,15 @@ class _EditPlaylistState extends State<EditPlaylist> {
                                     );
                                   } else {
                                     return MyCard(
-                                      song: new Tune(
-                                          "NOT A REAL${index}",
-                                          "(${widget.playlist.songs[index].title}) To be deleted",
-                                          "(${widget.playlist.songs[index].artist}) Tap to Undo",
-                                          "",
-                                          0,
-                                          "",
-                                          null,
-                                          [],
-                                          null,
-                                          null,
-                                          null),
+                                      song: new Tune("NOT A REAL${index}", "(${widget.playlist!.songs![index].title}) To be deleted",
+                                          "(${widget.playlist!.songs![index].artist}) Tap to Undo", "", 0, "", null, [], null, null, null),
                                       choices: null,
                                       onContextSelect: (choice) {},
                                       onContextCancel: (choice) {
                                         print("Cancelled");
                                       },
                                       onTap: () {
-                                        undoDeletingDong(widget.playlist.songs[index].id);
+                                        undoDeletingDong(widget.playlist!.songs![index].id!);
                                       },
                                       colors: [MyTheme.darkBlack, MyTheme.darkRed.withAlpha(200)],
                                     );
@@ -373,8 +364,8 @@ class _EditPlaylistState extends State<EditPlaylist> {
     );
   }
 
-  Future<String> openNameChangeModal(Playlist playlist) {
-    String currentName = playlist.name;
+  Future<String?>? openNameChangeModal(Playlist playlist) {
+    String currentName = playlist.name!;
     return showDialog(
         context: context,
         builder: (_) {
@@ -391,12 +382,10 @@ class _EditPlaylistState extends State<EditPlaylist> {
               style: TextStyle(
                 color: Colors.white,
               ),
-              decoration: InputDecoration(
-                  hintText: playlist?.name ?? "Choose a playlist name",
-                  hintStyle: TextStyle(color: MyTheme.grey500.withOpacity(0.2))),
+              decoration: InputDecoration(hintText: playlist.name ?? "Choose a playlist name", hintStyle: TextStyle(color: MyTheme.grey500.withOpacity(0.2))),
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text(
                   "Save",
                   style: TextStyle(color: MyTheme.darkRed),
@@ -405,7 +394,7 @@ class _EditPlaylistState extends State<EditPlaylist> {
                   Navigator.of(context, rootNavigator: true).pop(currentName);
                 },
               ),
-              FlatButton(
+              TextButton(
                   child: Text(
                     "Cancel",
                     style: TextStyle(color: MyTheme.darkRed),
@@ -424,35 +413,31 @@ class _EditPlaylistState extends State<EditPlaylist> {
   }
 
   void deleteSongFromPlaylist(Tune song) async {
-    int indexOfSongToDelete = widget.playlist.songs.indexOf(song);
+    int indexOfSongToDelete = widget.playlist!.songs!.indexOf(song);
     if (indexOfSongToDelete != -1) {
       print("will delete song title : ${song.title}");
       // widget.playlist.songs.removeAt(indexOfSongToDelete);
-      removedSongsIds.add(song.id);
-      songsToBeRemoved.add(song);
+      removedSongsIds!.add(song.id!);
+      songsToBeRemoved!.add(song);
       setState(() {});
     }
   }
 
-  Future<bool> OnPopWithUnsavedContent() async {
-    if (removedSongsIds.length > 0) {
+  Future<bool?>? OnPopWithUnsavedContent() async {
+    if (removedSongsIds!.length > 0) {
       String deletionMessage = "Unsaved changes, would you like to save now? Songs that would be deleted : ";
-      songsToBeRemoved.forEach((song) {
+      songsToBeRemoved!.forEach((song) {
         deletionMessage = "${deletionMessage} ${song.title}";
       });
       deletionMessage = "${deletionMessage} ?";
       deletionMessage = "${deletionMessage} ?";
       bool deleting = await DialogService.showConfirmDialog(context,
-          title: "Unsaved Changes",
-          confirmButtonText: "SAVE & QUIT",
-          cancelButtonText: "Don't save",
-          message: deletionMessage,
-          titleColor: MyTheme.darkRed);
+          title: "Unsaved Changes", confirmButtonText: "SAVE & QUIT", cancelButtonText: "Don't save", message: deletionMessage, titleColor: MyTheme.darkRed);
       if (deleting != null && deleting == true) {
         ///Modifying the playlist name is not implemented yet so the value in the MapEntry is null
         Navigator.of(context).pop({
           "removedSongsId": removedSongsIds,
-          "playlist": this.playlistInEditing.value,
+          "playlist": this.playlistInEditing!.value,
         });
       } else {
         //This will signal that no songs have been deleted
@@ -464,45 +449,46 @@ class _EditPlaylistState extends State<EditPlaylist> {
     } else {
       Navigator.of(context).pop({
         "removedSongsId": null,
-        "playlist": this.playlistInEditing.value,
+        // "playlist": this.playlistInEditing!.value,
+        "playlist": null,
       });
     }
+    return null;
   }
 
-  void saveBackTheRemovedSongs({String message}) async {
-    if (removedSongsIds.length != 0 || this.playlistInEditing.value != null) {
-      String savingMessage;
-      if (removedSongsIds.length != 0) {
+  void saveBackTheRemovedSongs({String? message}) async {
+    if (removedSongsIds!.length != 0 || this.playlistInEditing!.value != null) {
+      String? savingMessage;
+      if (removedSongsIds!.isNotEmpty) {
         savingMessage = "Delete : ";
-        songsToBeRemoved.forEach((song) {
+        songsToBeRemoved!.forEach((song) {
           savingMessage = "${savingMessage} ${song.title}";
         });
         savingMessage = "${savingMessage} ?";
       }
 
-      bool deleting = await DialogService.showConfirmDialog(context,
-          title: "Confirm Your Action", message: message ?? savingMessage, titleColor: MyTheme.darkRed);
+      bool deleting = await DialogService.showConfirmDialog(context, title: "Confirm Your Action", message: message ?? savingMessage, titleColor: MyTheme.darkRed);
 
       if (deleting != null && deleting == true) {
         ///Modifying the playlist name is not implemented yet so the value in the MapEntry is null
         Navigator.of(context).pop({
           "removedSongsId": removedSongsIds,
-          "playlist": this.playlistInEditing.value,
+          "playlist": this.playlistInEditing!.value,
         });
       }
     }
   }
 
   void clearAllChanges() {
-    removedSongsIds.clear();
-    songsToBeRemoved.clear();
+    removedSongsIds!.clear();
+    songsToBeRemoved!.clear();
     setState(() {});
   }
 
   void undoDeletingDong(String id) {
-    removedSongsIds.remove(id);
+    removedSongsIds!.remove(id);
 
-    songsToBeRemoved.removeWhere((song) {
+    songsToBeRemoved!.removeWhere((song) {
       return song.id == id;
     });
     setState(() {});

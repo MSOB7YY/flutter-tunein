@@ -4,28 +4,27 @@ import 'package:rxdart/rxdart.dart';
 
 class PageService {
 // Sub PAGEVIEW
-  BehaviorSubject<double> _pageIndex$;
+  late BehaviorSubject<double> _pageIndex$;
   BehaviorSubject<double> get pageIndex$ => _pageIndex$;
-  var _pageController;
+  late var _pageController;
   get pageViewController => _pageController;
 
   // HEADER NAVIGATION BAR
-  ScrollController _headerController;
+  late ScrollController _headerController;
   ScrollController get headerController => _headerController;
-  double _offset;
-  double _width;
-  List<double> _navSizes;
-  List<double> _cumulativeNavSizes;
-  bool _isSet;
-  int _setCount;
+  late double _offset;
+  late double _width;
+  late List<double> _navSizes;
+  late List<double> _cumulativeNavSizes;
+  late bool _isSet;
+  late int _setCount;
   List<double> get navSizes => _navSizes;
   List<double> get cumulativeNavSizes => _cumulativeNavSizes;
 
   final int id;
   final double viewPort;
   final Controller;
-  PageService(this.id,{double this.viewPort=1,  this.Controller}) {
-
+  PageService(this.id, {double this.viewPort = 1, this.Controller}) {
     _initPageView();
     _initHeaderNavBar();
     _registerListeners();
@@ -39,8 +38,10 @@ class PageService {
     if (_isSet) {
       return;
     }
-    GlobalKey key = headerItems[id][index].value;
-    RenderBox renderBoxRed = key.currentContext.findRenderObject();
+    GlobalKey key = headerItems[id]![index].value;
+
+    RenderBox renderBoxRed =
+        key.currentContext!.findRenderObject() as RenderBox;
     double width = renderBoxRed.size.width;
     _navSizes[index] = width;
     _setCount = _setCount + 1;
@@ -48,7 +49,7 @@ class PageService {
   }
 
   void _checkSet() {
-    if (_setCount == headerItems[id].length) {
+    if (_setCount == headerItems[id]!.length) {
       _isSet = true;
       _constructCumulative();
     }
@@ -65,7 +66,8 @@ class PageService {
 
   _initPageView() {
     _pageIndex$ = BehaviorSubject<double>.seeded(0);
-    _pageController = this.Controller??PageController(viewportFraction: viewPort);
+    _pageController =
+        this.Controller ?? PageController(viewportFraction: viewPort);
   }
 
   _initHeaderNavBar() {
@@ -73,8 +75,10 @@ class PageService {
     _width = _offset = 0;
     _setCount = 0;
     _isSet = false;
-    _navSizes = List<double>(headerItems[id].length);
-    _cumulativeNavSizes = List<double>();
+    // _navSizes = List<double>(headerItems[id]!.length);
+    _navSizes = List<double>.filled(headerItems[id]!.length, 0);
+
+    _cumulativeNavSizes = <double>[];
   }
 
   void _registerListeners() {

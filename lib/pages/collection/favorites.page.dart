@@ -43,7 +43,7 @@ class _FavoritesPageState extends State<FavoritesPage>
                 final _songs = snapshot.data;
                 return GridView.builder(
                   padding: EdgeInsets.all(0),
-                  itemCount: _songs.length,
+                  itemCount: _songs!.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 3,

@@ -6,7 +6,7 @@ import 'package:Tunein/services/locator.dart';
 import 'package:flutter/material.dart';
 
 class CollectionPage extends StatelessWidget {
-  CollectionPage({Key key}) : super(key: key);
+  CollectionPage({Key? key}) : super(key: key);
   final layoutService = locator<LayoutService>();
   @override
   Widget build(BuildContext context) {

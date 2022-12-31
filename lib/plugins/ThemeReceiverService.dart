@@ -1,6 +1,3 @@
-
-
-
 import 'dart:async';
 
 import 'package:Tunein/plugins/nano.dart';
@@ -9,38 +6,33 @@ import 'package:rxdart/rxdart.dart';
 import 'package:tunein_image_utils_plugin/tunein_image_utils_plugin.dart';
 
 class ThemeReceiverService {
-
-
-  BehaviorSubject<List<int>> _color$;
+  late BehaviorSubject<List<int>> _color$;
   BehaviorSubject<List<int>> get color$ => _color$;
 
-  Map<String, List<int>> _savedColors;
-  Map<String, List<int>> _artistSavedColors;
-  List<int> defaultColors =  [0xff111111, 0xffffffff, 0xffffffff];
+  late Map<String?, List<int>> _savedColors;
+  late Map<String, List<int>> _artistSavedColors;
+  late List<int> defaultColors = [0xff111111, 0xffffffff, 0xffffffff];
 
-
-  ThemeReceiverService(){
+  ThemeReceiverService() {
     _initStreams();
     _savedColors = Map<String, List<int>>();
-    _artistSavedColors= Map<String, List<int>>();
+    _artistSavedColors = Map<String, List<int>>();
   }
 
-  Future<void> updateTheme(String songId, String songArt) async {
+  Future<void> updateTheme(String songId, String? songArt) async {
     if (_savedColors.containsKey(songId)) {
-      _color$.add(_savedColors[songId]);
+      _color$.add(_savedColors[songId]!);
       return;
     }
 
-
-    String path = songArt;
+    String? path = songArt;
     if (path == null) {
       _color$.add([0xff111111, 0xffffffff]);
       return;
     }
 
-    final colors =
-    await TuneinImageUtilsPlugin.getColor(path);
-    List<int> _colors = List<int>();
+    final colors = await TuneinImageUtilsPlugin.getColor(path);
+    List<int> _colors = [];
     for (var color in colors) {
       _colors.add(color);
     }
@@ -50,47 +42,43 @@ class ThemeReceiverService {
     return;
   }
 
-  Future<List<int>> getThemeColors(String songId, String songArt) async{
-    List<int> color=[];
+  Future<List<int>> getThemeColors(String? songId, String? songArt) async {
+    List<int> color = [];
     if (_savedColors.containsKey(songId)) {
-      color.addAll(_savedColors[songId]);
-
+      color.addAll(_savedColors[songId]!);
 
       return color;
     }
 
-    String path = songArt;
+    String? path = songArt;
 
     if (path == null) {
       color.addAll(defaultColors);
       return color;
     }
     print(path);
-    final colors =
-    await TuneinImageUtilsPlugin.getColor(path);
+    final colors = await TuneinImageUtilsPlugin.getColor(path);
 
-    List<int> _colors = List<int>();
+    List<int> _colors = [];
     for (var color in colors) {
       _colors.add(color);
     }
-    if(_colors.length<3){
-      do{
+    if (_colors.length < 3) {
+      do {
         _colors.add(_colors[1]);
-      }while(_colors.length<3);
+      } while (_colors.length < 3);
     }
     color.addAll(_colors);
     _savedColors[songId] = _colors;
 
-
     return color;
   }
 
-  Future<List<int>> getArtistColors(int artistID, String artistCoverArtPath) async{
-    List<int> color=[];
+  Future<List<int>> getArtistColors(
+      int artistID, String artistCoverArtPath) async {
+    List<int> color = [];
     if (_artistSavedColors.containsKey(artistID)) {
-
-      color.addAll(_artistSavedColors[artistID]);
-
+      color.addAll(_artistSavedColors[artistID]!);
 
       return color;
     }
@@ -102,17 +90,16 @@ class ThemeReceiverService {
       return color;
     }
 
-    final colors =
-    await TuneinImageUtilsPlugin.getColor(path);
+    final colors = await TuneinImageUtilsPlugin.getColor(path);
 
-    List<int> _colors = List<int>();
+    List<int> _colors = [];
     for (var color in colors) {
       _colors.add(color);
     }
-    if(_colors.length<3){
-      do{
+    if (_colors.length < 3) {
+      do {
         _colors.add(_colors[1]);
-      }while(_colors.length<3);
+      } while (_colors.length < 3);
     }
     color.addAll(_colors);
     _artistSavedColors[artistID.toString()] = _colors;
@@ -120,19 +107,24 @@ class ThemeReceiverService {
     return color;
   }
 
-
-  Future execute(String caller, dynamic arguments){
-    switch(caller){
-      case "getArtistColors":{
-        return this.getArtistColors(arguments["artistId"],arguments["coverArt"]);
-      }
-      case "getThemeColors":{
-        return this.getThemeColors(arguments["songId"],arguments["coverArt"]);
-      }
-      case "updateTheme":{
-        return this.updateTheme(arguments["songId"],arguments["coverArt"]);
-      }
+  Future execute(String caller, dynamic arguments) {
+    switch (caller) {
+      case "getArtistColors":
+        {
+          return this
+              .getArtistColors(arguments["artistId"], arguments["coverArt"]);
+        }
+      case "getThemeColors":
+        {
+          return this
+              .getThemeColors(arguments["songId"], arguments["coverArt"]);
+        }
+      case "updateTheme":
+        {
+          return this.updateTheme(arguments["songId"], arguments["coverArt"]);
+        }
     }
+    throw Exception;
   }
 
   void _initStreams() {

@@ -19,24 +19,27 @@ class GridCell extends StatelessWidget {
     return StreamBuilder<List<int>>(
       stream: themeService.getThemeColors(song).asStream(),
       builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
-        List<int> songColors;
-        if(snapshot.hasData) {
-          songColors=snapshot.data;
+        List<int>? songColors;
+        if (snapshot.hasData) {
+          songColors = snapshot.data!;
         }
         return AnimatedContainer(
-          duration: Duration(milliseconds: 180),
+            duration: Duration(milliseconds: 180),
             color: MyTheme.darkgrey,
             curve: Curves.fastOutSlowIn,
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                song.albumArt == null ? Image.asset("images/cover.png") : Image
-                    .file(File(song.albumArt)),
+                song.albumArt == null
+                    ? Image.asset("images/cover.png")
+                    : Image.file(File(song.albumArt!)),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     width: double.infinity,
-                    color: songColors!=null?new Color(songColors[0]).withAlpha(225):MyTheme.darkgrey,
+                    color: songColors != null
+                        ? new Color(songColors[0]).withAlpha(225)
+                        : MyTheme.darkgrey,
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -44,21 +47,26 @@ class GridCell extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
-                            song.title,
+                            song.title!,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 13.5,
-                              color: (songColors!=null?new Color(songColors[1]):Colors.white70).withOpacity(.7),
+                              color: (songColors != null
+                                      ? new Color(songColors[1])
+                                      : Colors.white70)
+                                  .withOpacity(.7),
                             ),
                           ),
                         ),
                         Text(
-                          song.artist,
+                          song.artist!,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 12.5,
-                              color: (songColors!=null?new Color(songColors[1]):Colors.white70).withOpacity(.7)
-                          ),
+                              color: (songColors != null
+                                      ? new Color(songColors[1])
+                                      : Colors.white70)
+                                  .withOpacity(.7)),
                         ),
                       ],
                     ),
@@ -69,5 +77,4 @@ class GridCell extends StatelessWidget {
       },
     );
   }
-  }
-
+}

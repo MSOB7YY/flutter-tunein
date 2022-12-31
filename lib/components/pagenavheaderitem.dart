@@ -5,29 +5,29 @@ import 'dart:math' as math;
 
 class PageTitle extends StatelessWidget {
   final layoutService = locator<LayoutService>();
-  final String title;
-  final int index;
-  final int pageIndex;
+  final String? title;
+  final int? index;
+  final int? pageIndex;
   PageTitle({
-    Key key,
+    Key? key,
     this.pageIndex,
     this.title,
     this.index,
   }) : super(key: key);
 
   onAfterBuild(context) {
-    layoutService.pageServices[pageIndex].setSize(index);
+    layoutService.pageServices[pageIndex!].setSize(index!);
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<double>(
-      stream: layoutService.pageServices[pageIndex].pageIndex$,
+      stream: layoutService.pageServices[pageIndex!].pageIndex$,
       builder: (context, AsyncSnapshot<double> snapshot) {
         if (!snapshot.hasData) {
           return Container();
         }
-        final double pageValue = snapshot.data;
+        final double pageValue = snapshot.data!;
 
         double opacity = 0.24;
         int floor = pageValue.floor();
@@ -52,7 +52,7 @@ class PageTitle extends StatelessWidget {
           // width: 116,
           alignment: Alignment.centerLeft,
           child: Text(
-            title,
+            title!,
             style: TextStyle(
               color: Colors.white.withOpacity(opacity),
               fontSize: 22,
