@@ -10,7 +10,7 @@ class Requests {
   final requestService = locator<httpRequests>();
   final SettingsService = locator<settingService>();
 
-  Map<SettingsIds, String>? Settings = new Map();
+  Map<SettingsIds, String?>? Settings = new Map();
   StreamSubscription? settingStreamSubscription;
 
   Requests() {

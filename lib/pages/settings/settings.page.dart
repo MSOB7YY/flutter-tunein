@@ -54,18 +54,15 @@ class _SettingsPageState extends State<SettingsPage>
                 StreamBuilder(
                   stream: SettingService.settings$,
                   builder: (BuildContext context,
-                      AsyncSnapshot<Map<SettingsIds, String>> snapshot) {
+                      AsyncSnapshot<Map<SettingsIds, String?>> snapshot) {
                     if (!snapshot.hasData) {
                       return Container();
                     }
                     final _settings = snapshot.data;
                     return Container(
                       child: SettingsList(
-                        darkTheme: SettingsThemeData(
-                          settingsListBackground: MyTheme.darkBlack,
-                          tileDescriptionTextColor: MyTheme.grey300,
-                          titleTextColor: MyTheme.darkRed,
-                        ),
+                        lightTheme: MyTheme.settingsDarkTheme,
+                        brightness: Brightness.dark,
                         sections: [
                           SettingsSection(
                             title: Text('Region Settings'),
@@ -73,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage>
                               SettingsTile(
                                 title: Text('Language'),
                                 description: Text(
-                                    _settings![SettingsIds.SET_LANG] as String),
+                                    _settings![SettingsIds.SET_LANG] ?? ""),
                                 leading: Icon(
                                   Icons.language,
                                   color: MyTheme.grey300,
@@ -81,8 +78,7 @@ class _SettingsPageState extends State<SettingsPage>
                                 onPressed: (context) {
                                   changeSystemLanguage(
                                       gcontext,
-                                      _settings[SettingsIds.SET_LANG]
-                                          as String);
+                                      _settings[SettingsIds.SET_LANG] ?? "");
                                 },
                               ),
                             ],
@@ -309,7 +305,7 @@ class _SettingsPageState extends State<SettingsPage>
                               SettingsTile(
                                 title: Text('Discogs thumbnail quality'),
                                 description: Text(_settings[SettingsIds
-                                    .SET_DISCOG_THUMB_QUALITY] as String),
+                                    .SET_DISCOG_THUMB_QUALITY]  ?? ""),
                                 leading: Icon(
                                   Icons.high_quality,
                                   color: MyTheme.grey300,
@@ -381,11 +377,8 @@ class _SettingsPageState extends State<SettingsPage>
                         SettingService.DeserializeUISettings(_settings!)!;
                     return Container(
                       child: SettingsList(
-                        darkTheme: SettingsThemeData(
-                          settingsListBackground: MyTheme.darkBlack,
-                          tileDescriptionTextColor: MyTheme.grey300,
-                          titleTextColor: MyTheme.darkRed,
-                        ),
+                        lightTheme: MyTheme.settingsDarkTheme,
+                        brightness: Brightness.dark,
                         sections: [
                           SettingsSection(
                             title: Text('Album List'),
@@ -502,18 +495,15 @@ class _SettingsPageState extends State<SettingsPage>
                 StreamBuilder(
                   stream: SettingService.settings$,
                   builder: (BuildContext context,
-                      AsyncSnapshot<Map<SettingsIds, String>> snapshot) {
+                      AsyncSnapshot<Map<SettingsIds, String?>> snapshot) {
                     if (!snapshot.hasData) {
                       return Container();
                     }
                     final _settings = snapshot.data;
                     return Container(
                       child: SettingsList(
-                        darkTheme: SettingsThemeData(
-                          settingsListBackground: MyTheme.darkBlack,
-                          tileDescriptionTextColor: MyTheme.grey300,
-                          titleTextColor: MyTheme.darkRed,
-                        ),
+                        darkTheme: MyTheme.settingsDarkTheme,
+                        lightTheme: MyTheme.settingsDarkTheme,
                         sections: [
                           SettingsSection(
                             title: Text('Outgoing HTTP Server'),
@@ -891,7 +881,7 @@ class _SettingsPageState extends State<SettingsPage>
     //This will check the validity of the discog API INFO stored in teh settings
     //in the future this should be a generic check for any API that can be used and exactly the API that is selected from a list
 
-    Map<SettingsIds, String> currentSettings = SettingService.settings$.value;
+    Map<SettingsIds, String?> currentSettings = SettingService.settings$.value;
     //checks in place
     //check for Token
     if (currentSettings[SettingsIds.SET_DISCOG_API_KEY] != null) {
@@ -926,9 +916,8 @@ class _SettingsPageState extends State<SettingsPage>
                   height: MediaQuery.of(context).size.height / 2.5,
                   width: MediaQuery.of(context).size.width / 1.2,
                   child: SettingsList(
-                    darkTheme: SettingsThemeData(
-                      tileDescriptionTextColor: MyTheme.grey300,
-                    ),
+                    lightTheme: MyTheme.settingsDarkTheme,
+                    brightness: Brightness.dark,
                     sections: [
                       SettingsSection(
                           title: Text("Chose the language to use"),
@@ -993,9 +982,8 @@ class _SettingsPageState extends State<SettingsPage>
                   height: MediaQuery.of(context).size.height / 2.5,
                   width: MediaQuery.of(context).size.width / 1.2,
                   child: SettingsList(
-                    darkTheme: SettingsThemeData(
-                      tileDescriptionTextColor: MyTheme.grey300,
-                    ),
+                    lightTheme: MyTheme.settingsDarkTheme,
+                    brightness: Brightness.dark,
                     sections: [
                       SettingsSection(
                           title: Text("Chose the quality to use"),

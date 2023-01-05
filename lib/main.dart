@@ -34,6 +34,8 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: [
         //LanguageService.flutterI18nDelegate,
       ],
+      darkTheme: MyTheme.darkTheme,
+      themeMode: ThemeMode.dark,
       home: Wrapper(
         child: Column(
           mainAxisSize: MainAxisSize.max,

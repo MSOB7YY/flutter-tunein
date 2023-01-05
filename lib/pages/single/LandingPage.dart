@@ -616,7 +616,7 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
         if (e.albumArt == null) {
           return await Asset8bitList;
         }
-        return await ConversionUtils.FileUriTo8Bit(e.albumArt!, fileInstead: File(""));
+        return await ConversionUtils.FileUriTo8Bit(e.albumArt!, fileInstead: null);
       }).toList());
 
       Uint8List? topImage;

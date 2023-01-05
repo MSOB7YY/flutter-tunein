@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:settings_ui/settings_ui.dart';
 
 class MyTheme {
   static final darkRed = Color(0xffff245a);
@@ -10,6 +11,19 @@ class MyTheme {
   static final darkgrey = Color(0xffa3acbd);
   static final bgBottomBar = Color(0xff1e1e1e);
   static final bgdivider = Color(0xff2c2c2c);
+
+  static final darkTheme = ThemeData(
+    backgroundColor: darkBlack,
+    primaryColor: grey700,
+    colorScheme: const ColorScheme.dark()
+  );
+  static final settingsDarkTheme = SettingsThemeData(
+      settingsListBackground: MyTheme.darkBlack,
+      tileDescriptionTextColor: MyTheme.grey300,
+      titleTextColor: MyTheme.darkRed,
+      tileHighlightColor: MyTheme.grey300,
+      settingsTileTextColor: MyTheme.grey300
+  );
 }
 
 class MyUtils {

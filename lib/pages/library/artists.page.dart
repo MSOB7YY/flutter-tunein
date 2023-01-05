@@ -40,12 +40,13 @@ class _ArtistsPageState extends State<ArtistsPage>
     super.build(context);
     var size = MediaQuery.of(context).size;
     double artistGridCellHeight = uiScaleService.ArtistGridCellHeight(size);
+    BehaviorSubject<String?> settingStream = SettingService.getOrCreateSingleSettingStream(
+        SettingsIds.SET_ALBUM_LIST_PAGE);
     return Container(
       child: StreamBuilder(
         stream: Rx.combineLatest2(
             musicService.artists$,
-            SettingService.getOrCreateSingleSettingStream(
-                SettingsIds.SET_ALBUM_LIST_PAGE),
+            settingStream,
             (a, b) => MapEntry<List<Artist>, String>(a, b!)),
         builder: (BuildContext context,
             AsyncSnapshot<MapEntry<List<Artist>, String>> snapshot) {

@@ -99,8 +99,8 @@ class ConversionUtils {
       required Size imageSize}) async {
     final RenderRepaintBoundary repaintBoundary = RenderRepaintBoundary();
 
-    logicalSize = ui.window.physicalSize / ui.window.devicePixelRatio;
-    imageSize = ui.window.physicalSize;
+    logicalSize ??= ui.window.physicalSize / ui.window.devicePixelRatio;
+    imageSize ??= ui.window.physicalSize;
 
     assert(logicalSize.aspectRatio == imageSize.aspectRatio);
 
@@ -115,7 +115,7 @@ class ConversionUtils {
     );
 
     final PipelineOwner pipelineOwner = PipelineOwner();
-    final BuildOwner buildOwner = BuildOwner();
+    final BuildOwner buildOwner = BuildOwner(focusManager: FocusManager());
 
     pipelineOwner.rootNode = renderView;
     renderView.prepareInitialFrame();

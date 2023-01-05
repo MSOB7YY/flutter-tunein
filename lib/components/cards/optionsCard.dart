@@ -133,7 +133,10 @@ class MoreOptionsCard extends StatelessWidget {
                       .then((value) {
                     memoryCacheService.setCacheItem(uniqueID, value);
                     return Image.memory(value);
-                  }).asStream(),
+                  }).catchError((onError){
+                    print(onError);
+                  }).asStream()
+                  ,
                   inCurve: Curves.easeIn,
                   fadeDuration: Duration(milliseconds: 50),
                   durationUntilFadeStarts: Duration(milliseconds: 0),
