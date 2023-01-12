@@ -19,7 +19,7 @@ class ThemeReceiverService {
     _artistSavedColors = Map<String, List<int>>();
   }
 
-  Future<void> updateTheme(String songId, String? songArt) async {
+  Future<void> updateTheme(String? songId, String? songArt) async {
     if (_savedColors.containsKey(songId)) {
       _color$.add(_savedColors[songId]!);
       return;

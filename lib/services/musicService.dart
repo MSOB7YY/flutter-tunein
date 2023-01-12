@@ -702,7 +702,7 @@ class MusicService {
     }
 
     if (_upnpOnSongCompleteSubscription == null) {
-      late Duration lastDuration;
+      late Duration? lastDuration = null;
       _upnpOnSongCompleteSubscription = Rx.combineLatest2(
           castService.castingPlayerState,
           castService.currentPosition,
@@ -714,12 +714,13 @@ class MusicService {
             //we on't be able to get that the song ended so we will be at songLength - 1 second then Zero.
 
             bool willCallOnSongComplete = false;
-            willCallOnSongComplete = ((data.value.inMilliseconds == 0 &&
-                    (lastDuration.inMilliseconds + 2100 >
-                        (playerState$.value.value?.duration ?? 0) )) ||
-                (data.value.inMilliseconds + 2100 >
-                    (playerState$.value.value?.duration ?? 0)));
-
+            if(lastDuration != null){
+              willCallOnSongComplete = ((data.value.inMilliseconds == 0 &&
+                  (lastDuration!.inMilliseconds + 2100 >
+                      (playerState$.value.value?.duration ?? 0) )) ||
+                  (data.value.inMilliseconds + 2100 >
+                      (playerState$.value.value?.duration ?? 0)));
+            }
             lastDuration = data.value;
             if ((data.key == PlayerState.stopped) && willCallOnSongComplete) {
               if (castService.castingState.value == CastState.CASTING) {

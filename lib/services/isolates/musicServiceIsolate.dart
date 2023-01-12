@@ -154,10 +154,13 @@ class musicServiceIsolate {
         case "registerAFileToBeServed":
           {
             //The message structure is like follow : MapEntry(id, MapEntry(uri, contentType))
-            MapEntry<String, MapEntry<String, String>> newMessage =
+            MapEntry<String?, MapEntry<String?, String>> newMessage =
                 incomingMessage.message;
-            StandardIsolateFunctions.filesToServe[newMessage.key] =
-                MapEntry(newMessage.value.key, newMessage.value.value);
+            if(newMessage.key != null){
+              StandardIsolateFunctions.filesToServe[newMessage.key!] =
+                  MapEntry(newMessage.value.key!, newMessage.value.value);
+            }
+
             incomingMessage.sender!.send(true);
             break;
           }

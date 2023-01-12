@@ -583,7 +583,6 @@ class TrackListDeckComponent extends StatelessWidget {
             //The following condition will be triggered when the casting state
             //changes elsewhere so we must update this widget and toggle the casting
             castService.castingState.distinct().listen((data) {
-              print("the stream is distinct ${data}");
               Widget? badgeToBe;
               Color? badgeColor;
               Icon? iconToBe = Icon(Icons.cast);

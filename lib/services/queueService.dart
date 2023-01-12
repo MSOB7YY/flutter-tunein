@@ -65,7 +65,7 @@ class QueueService {
           break;
         case QueueState.STOPPED:
           //start the queue
-          currentRunner!.cancel();
+          currentRunner?.cancel();
           currentQueueState = QueueState.STARTING;
           print("queue will start");
           QueueRunnerStart();
@@ -74,11 +74,14 @@ class QueueService {
         default:
           break;
       }
+      return true;
     } else {
       print(
           "can't start queue, an other one que is already starting or is ongoing");
+      return false;
     }
-    throw Exception;
+
+    return false;
   }
 
   Future<bool> pauseQueue() async {

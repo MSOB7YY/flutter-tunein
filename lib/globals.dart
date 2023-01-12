@@ -22,7 +22,8 @@ class MyTheme {
       tileDescriptionTextColor: MyTheme.grey300,
       titleTextColor: MyTheme.darkRed,
       tileHighlightColor: MyTheme.grey300,
-      settingsTileTextColor: MyTheme.grey300
+      settingsTileTextColor: MyTheme.grey300,
+    leadingIconsColor: MyTheme.darkRed
   );
 }
 

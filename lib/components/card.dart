@@ -314,7 +314,7 @@ class MyCard extends StatelessWidget {
                               choices: choices!,
                               onContextSelect: onContextSelect!,
                               screenSize: ScreenSize!,
-                              staticOffsetFromBottom: StaticContextMenuFromBottom!,
+                              staticOffsetFromBottom: StaticContextMenuFromBottom,
                             )
                           : Container()
                     ],

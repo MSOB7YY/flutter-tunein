@@ -34,10 +34,10 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "46a32b96fbc41307f2e00ee4afaf01835197681e"
+      resolved-ref: "63f8fa753db765518be256aa17c01b7571b1343f"
       url: "https://github.com/moda20/audioplayer"
     source: git
-    version: "0.5.4"
+    version: "0.5.5"
   autocomplete_textfield:
     dependency: "direct main"
     description:
@@ -287,7 +287,7 @@ packages:
       name: lists
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.6"
+    version: "1.0.1"
   marquee:
     dependency: "direct main"
     description:
@@ -408,7 +408,7 @@ packages:
       name: path_provider_macos
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.6"
+    version: "2.0.7"
   path_provider_platform_interface:
     dependency: transitive
     description:
@@ -531,7 +531,7 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.15"
+    version: "2.0.16"
   shared_preferences_android:
     dependency: transitive
     description:
@@ -539,10 +539,10 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.14"
-  shared_preferences_ios:
+  shared_preferences_foundation:
     dependency: transitive
     description:
-      name: shared_preferences_ios
+      name: shared_preferences_foundation
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
@@ -553,13 +553,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
-  shared_preferences_macos:
-    dependency: transitive
-    description:
-      name: shared_preferences_macos
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.4"
   shared_preferences_platform_interface:
     dependency: transitive
     description:
@@ -634,7 +627,7 @@ packages:
       name: strings
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.4"
+    version: "0.2.2"
   sync_scroll_library:
     dependency: transitive
     description:
@@ -685,13 +678,13 @@ packages:
       name: unicode
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.4"
+    version: "0.3.1"
   upnp:
     dependency: "direct main"
     description:
       path: "."
       ref: master
-      resolved-ref: "8a60890da2e6af19adaa109f809ccc3f47ceeabd"
+      resolved-ref: a2f6889c9ed8edbf2e298f29d6c626e63fc086b3
       url: "https://github.com/moda20/upnp.dart"
     source: git
     version: "2.0.0+4"
@@ -785,7 +778,7 @@ packages:
       name: xdg_directories
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.0+2"
+    version: "0.2.0+3"
   xml:
     dependency: transitive
     description:

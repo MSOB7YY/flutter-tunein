@@ -27,8 +27,8 @@ class CastService {
   late BehaviorSubject<CastItem?> _castItem;
   late BehaviorSubject<Duration> _currentPosition;
   late BehaviorSubject<Device?> _currentDeviceToBeUsed;
-  late Timer positionTimer;
-  late StreamSubscription castingPlayerStateTimer;
+  late Timer? positionTimer = null;
+  late StreamSubscription? castingPlayerStateTimer = null;
   late BehaviorSubject<Map<String, String>?> PlayerStateStream;
   late UpnpPlugin.upnp UpnPPlugin;
 
@@ -57,7 +57,7 @@ class CastService {
   Future feedCurrentPosition(
       {bool perpetual = true, bool feedState = true}) async {
     if (perpetual) {
-      if (positionTimer == null) {
+      if ( positionTimer == null) {
         if (_currentDeviceToBeUsed.value != null) {
           positionTimer = Timer.periodic(Duration(seconds: 1), (Timer) async {
             if (castingState.value == CastState.CASTING &&
@@ -116,42 +116,45 @@ class CastService {
                 newSub: true);
 
             castingPlayerStateTimer = PlayerStateStream.listen((data) {
-              subscriptionIDs.indexOf(int.tryParse(data!["subscriptionID"]!)) ==
-                      -1
-                  ? subscriptionIDs.add(int.tryParse(data["subscriptionID"]!))
-                  : null;
-              xml.XmlDocument doc = xml.XmlDocument.parse(data["LastChange"]!);
-              List<xml.XmlElement> listOFTransportState =
-                  doc.findAllElements("TransportState").toList();
+              if(data != null){
+                subscriptionIDs.indexOf(int.tryParse(data["subscriptionID"]!)) ==
+                    -1
+                    ? subscriptionIDs.add(int.tryParse(data["subscriptionID"]!))
+                    : null;
+                xml.XmlDocument doc = xml.XmlDocument.parse(data["LastChange"]!);
+                List<xml.XmlElement> listOFTransportState =
+                doc.findAllElements("TransportState").toList();
 
-              if (listOFTransportState.length != 0) {
-                String? state = listOFTransportState[0].getAttribute("val");
-                switch (state) {
-                  case "PLAYING":
-                    {
-                      _castingPlayerState.value != PlayerState.playing
-                          ? _castingPlayerState.add(PlayerState.playing)
-                          : null;
+                if (listOFTransportState.length != 0) {
+                  String? state = listOFTransportState[0].getAttribute("val");
+                  switch (state) {
+                    case "PLAYING":
+                      {
+                        _castingPlayerState.value != PlayerState.playing
+                            ? _castingPlayerState.add(PlayerState.playing)
+                            : null;
+                        break;
+                      }
+                    case "PAUSED_PLAYBACK":
+                      {
+                        _castingPlayerState.value != PlayerState.paused
+                            ? _castingPlayerState.add(PlayerState.paused)
+                            : null;
+                        break;
+                      }
+                    case "STOPPED":
+                      {
+                        _castingPlayerState.value != PlayerState.stopped
+                            ? _castingPlayerState.add(PlayerState.stopped)
+                            : null;
+                        break;
+                      }
+                    default:
                       break;
-                    }
-                  case "PAUSED_PLAYBACK":
-                    {
-                      _castingPlayerState.value != PlayerState.paused
-                          ? _castingPlayerState.add(PlayerState.paused)
-                          : null;
-                      break;
-                    }
-                  case "STOPPED":
-                    {
-                      _castingPlayerState.value != PlayerState.stopped
-                          ? _castingPlayerState.add(PlayerState.stopped)
-                          : null;
-                      break;
-                    }
-                  default:
-                    break;
+                  }
                 }
               }
+
             });
           }
         }
@@ -160,10 +163,10 @@ class CastService {
   }
 
   stopFeedingCurrentPosition() {
-    positionTimer.cancel();
+    positionTimer?.cancel();
     positionTimer = Timer(const Duration(seconds: 0), () {});
-    castingPlayerStateTimer.cancel();
-    castingPlayerStateTimer = null as StreamSubscription<dynamic>;
+    castingPlayerStateTimer?.cancel();
+    castingPlayerStateTimer = null;
     if (!PlayerStateStream.isClosed) PlayerStateStream.close();
     PlayerStateStream = null as BehaviorSubject<Map<String, String>>;
 

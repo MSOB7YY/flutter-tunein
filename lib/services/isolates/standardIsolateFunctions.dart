@@ -163,18 +163,19 @@ class StandardIsolateFunctions {
     newSongMap.keys.forEach((e) {
       if (e == null) return null;
 
-      Album albumFound = albums.values.firstWhere((element) =>
+      Album? albumFound = albums.values.firstWhereOrNull((element) =>
       (element.title == e.album && element.artist == e.artist));
-      if (newSongMap[e] != 0) {
-        if (playTime[albumFound.id.toString()] == null) {
-          playTime[albumFound.id.toString()] = newSongMap[e]!;
-        } else {
-          playTime[albumFound.id.toString()] ==
-              newSongMap[e]! + playTime[albumFound.id.toString()]!;
-        }
+      if(albumFound != null){
+        if (newSongMap[e] != 0) {
+          if (playTime[albumFound.id.toString()] == null) {
+            playTime[albumFound.id.toString()] = newSongMap[e]!;
+          } else {
+            playTime[albumFound.id.toString()] ==
+                newSongMap[e]! + playTime[albumFound.id.toString()]!;
+          }
+        };
+        topAlbums?.add(albumFound);
       }
-      ;
-      topAlbums?.add(albumFound);
     });
 
     topAlbums = topAlbums?.toSet().toList();

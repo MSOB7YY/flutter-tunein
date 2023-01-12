@@ -87,15 +87,16 @@ class _SettingsPageState extends State<SettingsPage>
                             title: Text('Artists'),
                             tiles: [
                               SettingsTile.switchTile(
-                                initialValue: false,
+                                initialValue: _settings[
+                                SettingsIds.SET_ARTIST_THUMB_UPDATE] == "true",
                                 title: Text('Update Artist thumbnails'),
                                 description: Text(
                                     'Automatically update artist thumbnails via the internet'),
                                 leading:
                                     Icon(Icons.update, color: MyTheme.grey300),
                                 enabled: _settings[
-                                        SettingsIds.SET_ARTIST_THUMB_UPDATE] ==
-                                    "true",
+                                        SettingsIds.SET_DISCOG_API_KEY] !=
+                                    null,
                                 onToggle: (bool value) async {
                                   print("got the value : ${value}");
                                   bool validityCheck =
@@ -110,7 +111,7 @@ class _SettingsPageState extends State<SettingsPage>
                                         SettingsIds.SET_ARTIST_THUMB_UPDATE,
                                         value.toString());
                                     if (value) {
-                                      bool result =
+                                      bool? result =
                                           await DialogService.showConfirmDialog(
                                               context,
                                               message:
@@ -292,7 +293,7 @@ class _SettingsPageState extends State<SettingsPage>
                                       await openDiscogKeyTypeDialog(
                                           gcontext,
                                           _settings[SettingsIds
-                                              .SET_DISCOG_API_KEY] as String);
+                                              .SET_DISCOG_API_KEY] as String?);
                                   if (newKey !=
                                           _settings[
                                               SettingsIds.SET_DISCOG_API_KEY] &&
@@ -318,16 +319,16 @@ class _SettingsPageState extends State<SettingsPage>
                                 },
                               ),
                               SettingsTile.switchTile(
-                                initialValue: false,
+                                initialValue: _settings[SettingsIds
+                                    .SET_CUSTOM_NOTIFICATION_PLAYBACK_CONTROL] ==
+                                    "true",
                                 title: Text(
                                     'Custom notification playback controls'),
                                 description: Text(
                                     "Show and hide the notification playback controls"),
                                 leading: Icon(Icons.play_circle_outline,
                                     color: MyTheme.grey300),
-                                enabled: _settings[SettingsIds
-                                        .SET_CUSTOM_NOTIFICATION_PLAYBACK_CONTROL] ==
-                                    "true",
+                                enabled: true,
                                 onToggle: (bool value) async {
                                   print("got the value : ${value}");
 
@@ -338,16 +339,16 @@ class _SettingsPageState extends State<SettingsPage>
                                 },
                               ),
                               SettingsTile.switchTile(
-                                initialValue: false,
+                                initialValue: _settings[SettingsIds
+                                    .SET_ANDROID_NOTIFICATION_PLAYBACK_CONTROL] ==
+                                    "true",
                                 title: Text(
                                     'Android native notification playback controls'),
                                 description: Text(
                                     "Show and hide the native android notification playback controls"),
                                 leading: Icon(Icons.play_circle_outline,
                                     color: MyTheme.grey300),
-                                enabled: _settings[SettingsIds
-                                        .SET_ANDROID_NOTIFICATION_PLAYBACK_CONTROL] ==
-                                    "true",
+                                enabled:  true,
                                 onToggle: (bool value) async {
                                   print("got the value : ${value}");
 
@@ -1019,7 +1020,7 @@ class _SettingsPageState extends State<SettingsPage>
         });
   }
 
-  Future<String?> openDiscogKeyTypeDialog(context, String current) {
+  Future<String?> openDiscogKeyTypeDialog(context, String? current) {
     String currentKey = "";
     return showDialog(
         context: context,
@@ -1039,7 +1040,7 @@ class _SettingsPageState extends State<SettingsPage>
                 color: Colors.white,
               ),
               decoration: InputDecoration(
-                  hintText: "${current}",
+                  hintText: "${current ?? ''}",
                   hintStyle:
                       TextStyle(color: MyTheme.grey500.withOpacity(0.2))),
             ),

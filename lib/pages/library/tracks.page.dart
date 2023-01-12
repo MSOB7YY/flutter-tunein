@@ -591,7 +591,6 @@ class _TracksPageState extends State<TracksPage> with AutomaticKeepAliveClientMi
                           //The following condition will be triggered when the casting state
                           //changes elsewhere so we must update this widget and toggle the casting
                           castService.castingState.distinct().listen((data) {
-                            print("the stream is distinct ${data}");
                             Widget? badgeToBe;
                             Color? badgeColor;
                             Icon? iconToBe = Icon(Icons.cast);
@@ -1069,7 +1068,7 @@ class _TracksPageState extends State<TracksPage> with AutomaticKeepAliveClientMi
         });
       } else {
         //If there is no device registered so we need to search for devices and show a dialog for the user to pick from
-        upnp.Device selectedDevice = await DialogService.openDevicePickingDialog(context, null);
+        upnp.Device? selectedDevice = await DialogService.openDevicePickingDialog(context, null);
         if (selectedDevice != null) {
           castService.setDeviceToBeUsed(selectedDevice);
           musicService.stopMusic();

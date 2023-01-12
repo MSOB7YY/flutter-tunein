@@ -200,11 +200,11 @@ class DialogService {
       devicesNotSent = StreamBuilder(
         stream: castService.searchForDevices().asStream(),
         builder: (context, AsyncSnapshot<List<upnp.Device>> snapshot) {
-          devices = snapshot.data!;
           Widget animtableChild;
           if (!snapshot.hasData) {
             animtableChild = ShallowWidget;
           } else {
+            devices = snapshot.data!;
             if (devices!.length != 0) {
               animtableChild = ListView.builder(
                 padding: EdgeInsets.all(3),
