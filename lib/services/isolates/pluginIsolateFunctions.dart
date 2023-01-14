@@ -225,11 +225,11 @@ class PluginIsolateFunctions {
       List<Artist> newArtists = await fetchArtists(newAlbums);
       print("gona fetch playlists");
       List<Playlist> newPlaylistList = await retrievePlaylists();
-      finalReturnedMap["songs"] = newSongs.map((e) => e.toMap()).toList();
-      finalReturnedMap["albums"] = newAlbums.map((e) => e.toMap(e)).toList();
-      finalReturnedMap["artists"] = newArtists.map((e) => e.toMap(e)).toList();
+      finalReturnedMap["songs"] = List.of(newSongs.map((e) => e.toMap()));
+      finalReturnedMap["albums"] = List.of(newAlbums.map((e) => e.toMap(e)));
+      finalReturnedMap["artists"] = List.of(newArtists.map((e) => e.toMap(e)));
       finalReturnedMap["playlists"] =
-          newPlaylistList.map((e) => Playlist.toMap(e)).toList();
+          List.of(newPlaylistList.map((e) => Playlist.toMap(e)));
       print("songs number : ${newSongs.length}");
       print("Albums number : ${newAlbums.length}");
       print("Artists number : ${newArtists.length}");
@@ -240,7 +240,7 @@ class PluginIsolateFunctions {
       saveArtists(artistsToSave: newArtists);
       print("gona retrieve favorites");
       List<Tune> newFavs = await retrieveFavorites(allSongs: newSongs);
-      finalReturnedMap["favs"] = newFavs.map((e) => e.toMap()).toList();
+      finalReturnedMap["favs"] = List.of(newFavs.map((e) => e.toMap()));
     } else {
       print("gona fetch  old albums");
       List<Album> newAlbums = await fetchAlbums(data);
@@ -253,13 +253,13 @@ class PluginIsolateFunctions {
       List<Playlist> newPlaylistList = await retrievePlaylists();
       List<Tune> newFavs = await retrieveFavorites(allSongs: data);
 
-      finalReturnedMap["songs"] = data.map((e) => e.toMap()).toList();
-      finalReturnedMap["albums"] = newAlbums.map((e) => e.toMap(e)).toList();
-      finalReturnedMap["artists"] = artistsData.map((e) => e.toMap(e)).toList();
+      finalReturnedMap["songs"] = List.of(data.map((e) => e.toMap()));
+      finalReturnedMap["albums"] = List.of(newAlbums.map((e) => e.toMap(e)));
+      finalReturnedMap["artists"] = List.of(artistsData.map((e) => e.toMap(e)));
       finalReturnedMap["playlists"] =
-          newPlaylistList.map((e) => Playlist.toMap(e)).toList();
+          List.of(newPlaylistList.map((e) => Playlist.toMap(e)));
       finalReturnedMap["notNewStartup"] = [];
-      finalReturnedMap["favs"] = newFavs.map((e) => e.toMap()).toList();
+      finalReturnedMap["favs"] = List.of(newFavs.map((e) => e.toMap()));
     }
 
     return finalReturnedMap;
