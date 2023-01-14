@@ -147,11 +147,11 @@ class settingService {
     return newStream;
   }
 
-  updateSingleSetting(SettingsIds setting, String value) async {
+  updateSingleSetting(SettingsIds setting, String? value) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     try {
       Map<SettingsIds, String?> settingsMap = _settings$.value;
-      await _prefs.setString(getEnumValue(setting).toString(), value);
+      await _prefs.setString(getEnumValue(setting).toString(), value ?? "");
       settingsMap[setting] = value;
       _settings$.add(settingsMap);
       return true;

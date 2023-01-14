@@ -75,7 +75,7 @@ class ThemeReceiverService {
   }
 
   Future<List<int>> getArtistColors(
-      int artistID, String artistCoverArtPath) async {
+      int artistID, String? artistCoverArtPath) async {
     List<int> color = [];
     if (_artistSavedColors.containsKey(artistID)) {
       color.addAll(_artistSavedColors[artistID]!);
@@ -83,7 +83,7 @@ class ThemeReceiverService {
       return color;
     }
 
-    String path = artistCoverArtPath;
+    String? path = artistCoverArtPath;
 
     if (path == null) {
       color.addAll(defaultColors);

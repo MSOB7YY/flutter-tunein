@@ -1009,13 +1009,14 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
                                 transitionDuration: Duration(milliseconds: 100),
                                 context: context,
                                 pageBuilder: (context, anim1, anim2) {
+                                  List<int>? colorList = colors.map((e) => e ?? MyTheme.bgBottomBar.value).toList();
                                   return SinglePictureArtistPopupWidget(
                                       context: context,
                                       artist: Artists[index],
                                       screensize: screensize,
                                       title: Artists[index].name,
                                       subtitle: '',
-                                      colors: colors as List<int>?,
+                                      colors: colorList,
                                       topLeftImage: Artists[index].coverArt,
                                       underSubtitleTray: Column(
                                         children: <Widget>[
@@ -1078,20 +1079,18 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
                                               ),
                                             ],
                                           ),
-                                          SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
+                                          Container(
+                                              alignment: Alignment.centerRight,
+                                              padding: EdgeInsets.zero,
                                               child: Padding(
                                                 child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
                                                   mainAxisSize: MainAxisSize.max,
-                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.end,
                                                   children: <Widget>[
-                                                    Icon(
-                                                      Icons.av_timer,
-                                                      color: (colors != null && colors.length != 0) ? Color(colors[1]!) : Colors.white70,
-                                                    ),
                                                     Container(
                                                       child: Text(
-                                                        "${ConversionUtils.DurationToFancyText(Duration(seconds: playDuration[Artists[index].name] ?? 0))} of play time",
+                                                        "${ConversionUtils.DurationToFancyText(Duration(seconds: playDuration[Artists[index].name] ?? 0), orElse: "0 sec")}",
                                                         style: TextStyle(
                                                           color: (colors != null && colors.length != 0) ? Color(colors[1]!) : Colors.white70,
                                                           fontWeight: FontWeight.w700,
@@ -1100,9 +1099,13 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
                                                       ),
                                                       margin: EdgeInsets.only(left: 5),
                                                     ),
+                                                    Icon(
+                                                      Icons.av_timer,
+                                                      color: (colors != null && colors.length != 0) ? Color(colors[1]!) : Colors.white70,
+                                                    ),
                                                   ],
                                                 ),
-                                                padding: EdgeInsets.only(left: 4),
+                                                padding: EdgeInsets.only(right: 20),
                                               ))
                                         ],
                                       ));
@@ -1625,10 +1628,10 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
       List<int>? colors,
       Artist? artist,
       context}) {
-    File imageFile = TopLeftWidget == null
+    File? imageFile = TopLeftWidget == null
         ? topLeftImage != null
             ? File.fromUri(Uri.parse(topLeftImage))
-            : null as File
+            : null
         : TopLeftWidget as File;
     double popupWidth = screensize!.width * 0.85;
     double albumGridCellHeight = uiScaleService.AlbumArtistInfoPage(Size(popupWidth, screensize.height * 0.75));
@@ -1648,8 +1651,8 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
               },
               child: Container(
                 color: MyTheme.bgBottomBar,
-                margin: EdgeInsets.only(bottom: 5),
                 width: popupWidth,
+                padding: EdgeInsets.only(bottom: 5),
                 child: ShowWithFade(
                   durationUntilFadeStarts: Duration(milliseconds: 300),
                   fadeDuration: Duration(milliseconds: 50),
@@ -1659,6 +1662,7 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
                     color: MyTheme.bgBottomBar.withOpacity(.3),
                   ),
                   child: Container(
+                    padding: EdgeInsets.only(bottom: 5),
                     color: (colors != null && colors.length != 0) ? Color(colors[0]) : MyTheme.darkBlack,
                     width: popupWidth,
                     child: Row(
@@ -1707,7 +1711,7 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
                               if (underSubtitleTray != null) underSubtitleTray
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -1743,7 +1747,7 @@ class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClient
                       },
                       child: AlbumGridCell(
                         artist.albums[index],
-                        ((albumGridCellHeight * 0.8) / itemsPerRow) * 3,
+                        ((albumGridCellHeight * 0.5) / itemsPerRow) * 3,
                         albumGridCellHeight * 0.20,
                         animationDelay: (80 * newIndex) - (index < 3 ? ((3 - index) * 150) : 0),
                         useAnimation: !(80 == 0),

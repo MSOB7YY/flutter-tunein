@@ -226,6 +226,8 @@ class PluginIsolateFunctions {
       print("gona fetch playlists");
       List<Playlist> newPlaylistList = await retrievePlaylists();
       finalReturnedMap["songs"] = List.of(newSongs.map((e) => e.toMap()));
+      // TODO the List.of change here is a function of a bug/ issue with isolates from dart and flutter, and will be addressed in a future version of dart
+      // that is still in beta ATM : https://github.com/flutter/flutter/issues/113183#issuecomment-1382891942
       finalReturnedMap["albums"] = List.of(newAlbums.map((e) => e.toMap(e)));
       finalReturnedMap["artists"] = List.of(newArtists.map((e) => e.toMap(e)));
       finalReturnedMap["playlists"] =

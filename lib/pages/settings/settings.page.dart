@@ -127,6 +127,10 @@ class _SettingsPageState extends State<SettingsPage>
                                                   "Artist thumbnail update started",
                                               color: MyTheme.darkRed);
                                         });
+                                      }else {
+                                        SettingService.updateSingleSetting(
+                                            SettingsIds.SET_ARTIST_THUMB_UPDATE,
+                                            "false");
                                       }
                                     }
                                   }
@@ -599,9 +603,11 @@ class _SettingsPageState extends State<SettingsPage>
     );
   }
 
-  changeSystemLanguage(context, String current) async {
+  changeSystemLanguage(context, String? current) async {
     String? Language = await openLanguageSelectDialog(context, current);
-    SettingService.updateSingleSetting(SettingsIds.SET_LANG, Language!);
+    if(Language != null){
+      SettingService.updateSingleSetting(SettingsIds.SET_LANG, Language);
+    }
   }
 
   changeDiscogThumbnailDownloadQuality(context, String current) async {
@@ -892,7 +898,7 @@ class _SettingsPageState extends State<SettingsPage>
     }
   }
 
-  Future<String?> openLanguageSelectDialog(context, String current) {
+  Future<String?> openLanguageSelectDialog(context, String? current) {
     void changeLanguage(String language) {
       Navigator.of(context, rootNavigator: true).pop(language);
     }
@@ -929,7 +935,7 @@ class _SettingsPageState extends State<SettingsPage>
                                       ? Icon(Icons.check,
                                           color: MyTheme.grey300)
                                       : Icon(null),
-                                  title: lang,
+                                  title: Text(lang),
                                   onPressed: (context) {
                                     changeLanguage(lang);
                                   },
@@ -995,7 +1001,7 @@ class _SettingsPageState extends State<SettingsPage>
                                       ? Icon(Icons.check,
                                           color: MyTheme.grey300)
                                       : Icon(null),
-                                  title: quality,
+                                  title: Text(quality),
                                   onPressed: (context) {
                                     changeQuality(quality);
                                   },

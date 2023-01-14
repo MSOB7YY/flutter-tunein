@@ -12,7 +12,7 @@ class ConversionUtils {
   static final FileService = locator<fileService>();
 
   static String DurationToFancyText(Duration duration,
-      {showHours = true, showMinutes = true, showSeconds = true}) {
+      {showHours = true, showMinutes = true, showSeconds = true, String? orElse}) {
     assert(duration != null, "duration argument can't be null");
     String finalText = "";
     if (showHours && duration.inHours != 0) {
@@ -25,7 +25,7 @@ class ConversionUtils {
       finalText += "${duration.inSeconds.remainder(60)} sec";
     }
 
-    return finalText;
+    return orElse != null ? finalText == "" ? orElse : finalText : finalText;
   }
 
   static String DurationToStandardTimeDisplay(
